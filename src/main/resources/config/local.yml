@@ -1,0 +1,10 @@
+---
+development: true
+jdbc:
+  url: jdbc:mysql://localhost/test
+  username: root
+  password:
+
+dataSource:
+  minimumIdle: 8
+  maximumPoolSize: 100
