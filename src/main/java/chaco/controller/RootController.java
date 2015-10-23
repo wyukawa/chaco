@@ -32,32 +32,41 @@ public class RootController extends BaseController {
     @GET("/")
     public WebResponse index() throws IOException, TemplateException, SQLException {
         return this.freemarker("index.html.ftl")
+                .param("query", "")
                 .param("rows", new ArrayList<>())
                 .render();
     }
 
     @POST("/query")
-    public WebResponse select(@Param("sql") Optional<String> sql) throws IOException, TemplateException, SQLException {
-        try (Connection connection = db.getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(sql.orElse(""))) {
-                try (ResultSet resultSet = stmt.executeQuery()) {
-                    List<List<String>> rows = new ArrayList<>();
-                    int columnCount = stmt.getMetaData().getColumnCount();
-                    while (resultSet.next()) {
-                        List<String> columns = new ArrayList<>();
-                        for (int i = 1; i <= columnCount; i++) {
-                            String column = resultSet.getString(i);
-                            columns.add(column);
+    public WebResponse select(@Param("query") Optional<String> queryOptional) throws IOException, TemplateException {
+        List<List<String>> rows = new ArrayList<>();
+        queryOptional.ifPresent(query -> {
+            try {
+                try (Connection connection = db.getConnection()) {
+                    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                        try (ResultSet resultSet = stmt.executeQuery()) {
+                            int columnCount = stmt.getMetaData().getColumnCount();
+                            while (resultSet.next()) {
+                                List<String> columns = new ArrayList<>();
+                                for (int i = 1; i <= columnCount; i++) {
+                                    String column = resultSet.getString(i);
+                                    columns.add(column);
+                                }
+                                rows.add(columns);
+                            }
                         }
-                        rows.add(columns);
                     }
-
-                    return this.freemarker("index.html.ftl")
-                            .param("rows", rows)
-                            .render();
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-        }
+        });
+        return this.freemarker("index.html.ftl")
+                .param("query", queryOptional.orElse(""))
+                .param("rows", rows)
+                .render();
     }
+
+
 }
 
