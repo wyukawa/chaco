@@ -20,7 +20,11 @@
         <#list rows as row>
             <tr>
             <#list row as column>
-                <td>${column}</td>
+                <#if column??>
+                    <td>${column}</td>
+                <#else>
+                    <td>null</td>
+                </#if>
             </#list>
             </tr>
         </#list>
