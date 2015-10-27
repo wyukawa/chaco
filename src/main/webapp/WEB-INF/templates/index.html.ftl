@@ -5,7 +5,7 @@
 
 <form action="/query" method="post">
     <div class="form-group">
-        <label for="exampleInputEmail1">SQL</label>
+        <label>SQL</label>
         <textarea class="form-control" rows="3" name="query">${query}</textarea>
     </div>
     <button type="submit" class="btn btn-default">Execute</button>
