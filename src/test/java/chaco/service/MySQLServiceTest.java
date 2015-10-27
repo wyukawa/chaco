@@ -10,9 +10,4 @@ import chaco.TestBase;
 public class MySQLServiceTest extends TestBase {
 
 	MySQLService sut = getInjector().getInstance(MySQLService.class);
-
-	@Test
-	public void testJDBCMajorVersion() throws Exception {
-		assertThat(sut.getJDBCMajorVersion(), is(4));
-	}
 }

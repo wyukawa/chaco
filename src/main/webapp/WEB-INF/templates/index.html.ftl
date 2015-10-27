@@ -11,6 +11,10 @@
     <button type="submit" class="btn btn-default">Execute</button>
 </form>
 
+<#if error?has_content>
+    <div class="alert alert-danger" role="alert">${error}</div>
+</#if>
+
 <table class="table table-bordered">
     <thead>
         <#list rows as row>

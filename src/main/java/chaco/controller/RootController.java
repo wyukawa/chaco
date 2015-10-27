@@ -34,37 +34,35 @@ public class RootController extends BaseController {
         return this.freemarker("index.html.ftl")
                 .param("query", "")
                 .param("rows", new ArrayList<>())
+                .param("error", "")
                 .render();
     }
 
     @POST("/query")
     public WebResponse select(@Param("query") Optional<String> queryOptional) throws IOException, TemplateException {
-        List<List<String>> rows = new ArrayList<>();
-        queryOptional.ifPresent(query -> {
+
+        if (queryOptional.isPresent()) {
+            List<List<String>> rows = new ArrayList<>();
+            String error = "";
             try {
-                try (Connection connection = db.getConnection()) {
-                    try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                        try (ResultSet resultSet = stmt.executeQuery()) {
-                            int columnCount = stmt.getMetaData().getColumnCount();
-                            while (resultSet.next()) {
-                                List<String> columns = new ArrayList<>();
-                                for (int i = 1; i <= columnCount; i++) {
-                                    String column = resultSet.getString(i);
-                                    columns.add(column);
-                                }
-                                rows.add(columns);
-                            }
-                        }
-                    }
-                }
+                rows = mySQLService.getResultRows(queryOptional.get());
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                log.error(e.getMessage(), e);
+                error = e.getMessage();
             }
-        });
-        return this.freemarker("index.html.ftl")
-                .param("query", queryOptional.orElse(""))
-                .param("rows", rows)
-                .render();
+            return this.freemarker("index.html.ftl")
+                    .param("query", queryOptional.orElse(""))
+                    .param("rows", rows)
+                    .param("error", error)
+                    .render();
+        } else {
+            return this.freemarker("index.html.ftl")
+                    .param("query", "")
+                    .param("rows", new ArrayList<>())
+                    .param("error", "")
+                    .render();
+        }
+
     }
 
 
