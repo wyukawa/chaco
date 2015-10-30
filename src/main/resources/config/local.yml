@@ -1,9 +1,9 @@
 ---
 development: true
 jdbc:
-  url: jdbc:mysql://localhost/test
-  username: root
-  password:
+  url: jdbc:postgresql://localhost:5432/test
+  username: test_user
+  password: test_user
 
 dataSource:
   minimumIdle: 8

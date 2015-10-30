@@ -36,4 +36,37 @@ public class NetezzaService {
         }
         return resultRows;
     }
+
+    public List<String> getTableNames(String catalog, String schemaPattern) throws SQLException {
+        List<String> tableNamestableNames = new ArrayList<>();
+        try (ResultSet resultSet = this.connection.getMetaData().getTables(catalog, schemaPattern, "%", null)) {
+            while (resultSet.next()) {
+                String tableName = resultSet.getString("TABLE_NAME");
+                tableNamestableNames.add(tableName);
+            }
+            return tableNamestableNames;
+        }
+    }
+
+    public List<String> getSchemaNames() throws SQLException {
+        List<String> schemaNames = new ArrayList<>();
+        try (ResultSet resultSet = this.connection.getMetaData().getSchemas()) {
+            while (resultSet.next()) {
+                String schemaName = resultSet.getString("TABLE_SCHEM");
+                schemaNames.add(schemaName);
+            }
+            return schemaNames;
+        }
+    }
+
+    public List<String> getCatalogNames() throws SQLException {
+        List<String> catalogNames = new ArrayList<>();
+        try (ResultSet resultSet = this.connection.getMetaData().getCatalogs()) {
+            while (resultSet.next()) {
+                String catalogName = resultSet.getString("TABLE_CAT");
+                catalogNames.add(catalogName);
+            }
+            return catalogNames;
+        }
+    }
 }

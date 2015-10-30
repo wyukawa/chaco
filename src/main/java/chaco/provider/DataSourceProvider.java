@@ -16,7 +16,7 @@ public class DataSourceProvider implements Provider<DataSource> {
 	@Inject
 	public DataSourceProvider(Config config) {
 		dataSource = new HikariDataSource();
-		dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+		dataSource.setDriverClassName("org.postgresql.Driver");
 		dataSource.setJdbcUrl(config.getJdbc().getUrl());
 		dataSource.setUsername(config.getJdbc().getUsername());
 		dataSource.setPassword(config.getJdbc().getPassword());

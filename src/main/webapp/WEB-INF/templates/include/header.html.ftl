@@ -13,7 +13,7 @@
 
 <!-- Fixed navbar -->
 <nav class="navbar navbar-inverse navbar-top">
-    <div class="container">
+    <div class="container-full">
         <div class="navbar-header">
             <a class="navbar-brand" href="/">chaco</a>
         </div>
@@ -21,5 +21,5 @@
     </div>
 </nav>
 
-<div class="container">
+<div class="container-full">
 
