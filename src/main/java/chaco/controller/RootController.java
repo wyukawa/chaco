@@ -3,6 +3,7 @@ package chaco.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,48 @@ public class RootController extends BaseController {
                 .param("tableNames", tableNames)
                 .param("error", "")
                 .render();
+    }
+
+    @GET("/catalogNames")
+    public WebResponse getCatalogNames() {
+        HashMap<String, Object> retVal = new HashMap<String, Object>();
+        List<String> catalogNames = null;
+        try {
+            catalogNames = netezzaService.getCatalogNames();
+            retVal.put("catalogs", catalogNames);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            retVal.put("error", e.getMessage());
+        }
+        return this.renderJSON(retVal);
+    }
+
+    @GET("/schemaNames")
+    public WebResponse getSchemaNames() {
+        HashMap<String, Object> retVal = new HashMap<String, Object>();
+        List<String> schemaNames = null;
+        try {
+            schemaNames = netezzaService.getSchemaNames();
+            retVal.put("schemaNames", schemaNames);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            retVal.put("error", e.getMessage());
+        }
+        return this.renderJSON(retVal);
+    }
+
+    @GET("/tableNames")
+    public WebResponse getSchemaNames(@Param("catalog") Optional<String> catalogOptional, @Param("schema") Optional<String> schemaOptinal) {
+        HashMap<String, Object> retVal = new HashMap<String, Object>();
+        List<String> tableNames = null;
+        try {
+            tableNames = netezzaService.getTableNames(catalogOptional.orElse(""), schemaOptinal.orElse(""));
+            retVal.put("tableNames", tableNames);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            retVal.put("error", e.getMessage());
+        }
+        return this.renderJSON(retVal);
     }
 
     @POST("/query")
