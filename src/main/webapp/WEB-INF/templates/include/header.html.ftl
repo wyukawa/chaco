@@ -3,23 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>chaco</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/dynatree/css/ui.dynatree.css" rel="stylesheet">
+    <link href="static/jquery-ui/css/jquery-ui.min.css" rel="stylesheet">
     <script src="static/js/jquery-2.1.1.min.js"></script>
-    <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <script src="static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="static/jquery-ui/js/jquery-ui.min.js"></script>
+    <script src="static/dynatree/js/jquery.dynatree.min.js"></script>
+    <script src="static/chaco/js/chaco.js"></script>
 </head>
 <body>
 
-<!-- Fixed navbar -->
-<nav class="navbar navbar-inverse navbar-top">
+<div class="navbar navbar-inverse navbar-static-top">
     <div class="container-full">
         <div class="navbar-header">
             <a class="navbar-brand" href="/">chaco</a>
         </div>
-        <!--/.nav-collapse -->
     </div>
-</nav>
-
-<div class="container-full">
+</div>
 

@@ -6,21 +6,18 @@
 <table class="table">
     <tr>
         <td>
-            <ul>
-                <li>schemas
-                    <ul>
-                        <#list schemaNames as schemaName>
-                            <li>${schemaName}</li>
-                        </#list>
-                    </ul>
-                </li>
-            </ul>
+            <div id="tree">
+            </div>
+
+            <script>
+                var tree = chaco_tree();
+            </script>
         </td>
         <td>
             <form action="/query" method="post">
                 <div class="form-group">
                     <label>SQL</label>
-                    <textarea class="form-control" rows="3" name="query">${query}</textarea>
+                    <textarea class="form-control" rows="3" cols="150" name="query">${query}</textarea>
                 </div>
                 <button type="submit" class="btn btn-default">Execute</button>
             </form>
