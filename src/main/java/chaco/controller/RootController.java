@@ -62,6 +62,7 @@ public class RootController extends BaseController {
 
         try {
             return this.freemarker("index.html.ftl")
+                    .param("schemaNames", netezzaService.getSchemaNames())
                     .param("query", queryOptional.orElse(""))
                     .param("rows", netezzaService.getResultRows(queryOptional.orElse("")))
                     .param("error", "")
@@ -69,6 +70,7 @@ public class RootController extends BaseController {
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.freemarker("index.html.ftl")
+                    .param("schemaNames", netezzaService.getSchemaNames())
                     .param("query", queryOptional.orElse(""))
                     .param("rows", ImmutableList.of())
                     .param("error", e.getMessage())
