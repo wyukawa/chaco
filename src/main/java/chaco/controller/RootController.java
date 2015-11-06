@@ -29,6 +29,7 @@ public class RootController extends BaseController {
     @GET("/")
     public WebResponse index() throws IOException, TemplateException {
         return this.freemarker("index.html.ftl")
+                .param("schemaNames", netezzaService.getSchemaNames())
                 .param("query", "")
                 .param("rows", ImmutableList.of())
                 .param("error", "")

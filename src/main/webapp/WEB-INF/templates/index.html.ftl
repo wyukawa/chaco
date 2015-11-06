@@ -7,16 +7,14 @@
     <tr>
         <td>
             <ul>
-                <li>tables
+                <li>schemas
                     <ul>
-                        <#list tableNames as tableName>
-                            <li>${tableName}</li>
+                        <#list schemaNames as schemaName>
+                            <li>${schemaName}</li>
                         </#list>
                     </ul>
                 </li>
-                <li>a</li>
             </ul>
-
         </td>
         <td>
             <form action="/query" method="post">
