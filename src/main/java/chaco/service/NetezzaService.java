@@ -1,5 +1,7 @@
 package chaco.service;
 
+import com.google.common.collect.ImmutableList;
+
 import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,8 +21,8 @@ public class NetezzaService {
         this.connection = connection;
     }
 
-    public List<List<String>> getResultRows(String query) throws SQLException {
-        List<List<String>> resultRows = new ArrayList<>();
+    public List<List<String>> getResultRows(String query) throws SQLException{
+        ImmutableList.Builder<List<String>> resultRows = ImmutableList.builder();
         try (PreparedStatement stmt = this.connection.prepareStatement(query)) {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 int columnCount = stmt.getMetaData().getColumnCount();
@@ -34,39 +36,45 @@ public class NetezzaService {
                 }
             }
         }
-        return resultRows;
+        return resultRows.build();
     }
 
-    public List<String> getTableNames(String catalog, String schemaPattern) throws SQLException {
-        List<String> tableNamestableNames = new ArrayList<>();
+    public List<String> getTableNames(String catalog, String schemaPattern) {
+        ImmutableList.Builder<String> tableNamestableNames = ImmutableList.builder();
         try (ResultSet resultSet = this.connection.getMetaData().getTables(catalog, schemaPattern, "%", null)) {
             while (resultSet.next()) {
                 String tableName = resultSet.getString("TABLE_NAME");
                 tableNamestableNames.add(tableName);
             }
-            return tableNamestableNames;
+            return tableNamestableNames.build();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public List<String> getSchemaNames() throws SQLException {
-        List<String> schemaNames = new ArrayList<>();
+    public List<String> getSchemaNames() {
+        ImmutableList.Builder<String> schemaNames = ImmutableList.builder();
         try (ResultSet resultSet = this.connection.getMetaData().getSchemas()) {
             while (resultSet.next()) {
                 String schemaName = resultSet.getString("TABLE_SCHEM");
                 schemaNames.add(schemaName);
             }
-            return schemaNames;
+            return schemaNames.build();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public List<String> getCatalogNames() throws SQLException {
-        List<String> catalogNames = new ArrayList<>();
+    public List<String> getCatalogNames() {
+        ImmutableList.Builder<String> catalogNames = ImmutableList.builder();
         try (ResultSet resultSet = this.connection.getMetaData().getCatalogs()) {
             while (resultSet.next()) {
                 String catalogName = resultSet.getString("TABLE_CAT");
                 catalogNames.add(catalogName);
             }
-            return catalogNames;
+            return catalogNames.build();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -9,6 +9,8 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import me.geso.avans.annotation.GET;
@@ -25,87 +27,53 @@ public class RootController extends BaseController {
     private NetezzaService netezzaService;
 
     @GET("/")
-    public WebResponse index() throws IOException, TemplateException, SQLException {
-        List<String> tableNames = netezzaService.getTableNames("test", "test_schema");
+    public WebResponse index() throws IOException, TemplateException {
         return this.freemarker("index.html.ftl")
                 .param("query", "")
-                .param("rows", new ArrayList<>())
+                .param("rows", ImmutableList.of())
                 .param("error", "")
                 .render();
     }
 
     @GET("/catalogNames")
     public WebResponse getCatalogNames() {
-        HashMap<String, Object> retVal = new HashMap<String, Object>();
-        List<String> catalogNames = null;
-        try {
-            catalogNames = netezzaService.getCatalogNames();
-            retVal.put("catalogs", catalogNames);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            retVal.put("error", e.getMessage());
-        }
-        return this.renderJSON(retVal);
+        return this.renderJSON(ImmutableMap.builder().put("catalogs", netezzaService.getCatalogNames()).build());
     }
 
     @GET("/schemaNames")
     public WebResponse getSchemaNames() {
-        HashMap<String, Object> retVal = new HashMap<String, Object>();
-        List<String> schemaNames = null;
-        try {
-            schemaNames = netezzaService.getSchemaNames();
-            retVal.put("schemaNames", schemaNames);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            retVal.put("error", e.getMessage());
-        }
-        return this.renderJSON(retVal);
+        return this.renderJSON(ImmutableMap.builder().put("schemaNames", netezzaService.getSchemaNames()).build());
     }
 
     @GET("/tableNames")
     public WebResponse getTableNames(@Param("catalog") Optional<String> catalogOptional, @Param("schema") Optional<String> schemaOptinal) {
 
-        HashMap<String, Object> retVal = new HashMap<String, Object>();
-
         if (!catalogOptional.isPresent() || !schemaOptinal.isPresent()) {
-            retVal.put("error", "catalog and schema parameters are required");
-            return this.renderJSON(retVal);
+            return this.renderJSON(ImmutableMap.builder().put("error", "catalog and schema parameters are required").build());
         }
 
-        List<String> tableNames = null;
-        try {
-            tableNames = netezzaService.getTableNames(catalogOptional.orElse(""), schemaOptinal.orElse(""));
-            retVal.put("tableNames", tableNames);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            retVal.put("error", e.getMessage());
-        }
-        return this.renderJSON(retVal);
+        return this.renderJSON(ImmutableMap.builder().put("tableNames", netezzaService.getTableNames(catalogOptional.get(), schemaOptinal.get())).build());
+
     }
 
     @POST("/query")
     public WebResponse query(@Param("query") Optional<String> queryOptional) throws IOException, TemplateException {
 
-        HashMap<String, Object> retVal = new HashMap<String, Object>();
-
-        if (!queryOptional.isPresent()) {
-            retVal.put("error", "query is required");
-            return this.renderJSON(retVal);
-        }
-
-        List<List<String>> rows = new ArrayList<>();
-        String error = "";
         try {
-            rows = netezzaService.getResultRows(queryOptional.get());
+            return this.freemarker("index.html.ftl")
+                    .param("query", queryOptional.orElse(""))
+                    .param("rows", netezzaService.getResultRows(queryOptional.orElse("")))
+                    .param("error", "")
+                    .render();
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
-            error = e.getMessage();
+            return this.freemarker("index.html.ftl")
+                    .param("query", queryOptional.orElse(""))
+                    .param("rows", ImmutableList.of())
+                    .param("error", e.getMessage())
+                    .render();
         }
-        return this.freemarker("index.html.ftl")
-                .param("query", queryOptional.orElse(""))
-                .param("rows", rows)
-                .param("error", error)
-                .render();
+
     }
 
 }
