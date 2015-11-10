@@ -6,6 +6,11 @@
 <table class="table">
     <tr>
         <td>
+
+            <ul id="tableMenu" class="contextMenu">
+                <li><a href="#select">SELECT ... LIMIT 100</a></li>
+            </ul>
+
             <div id="tree">
             </div>
 
@@ -17,9 +22,9 @@
             <form action="/query" method="post">
                 <div class="form-group">
                     <label>SQL</label>
-                    <textarea class="form-control" rows="3" cols="150" name="query">${query}</textarea>
+                    <textarea class="form-control" rows="3" cols="150" id="query" name="query">${query}</textarea>
                 </div>
-                <button type="submit" class="btn btn-default">Execute</button>
+                <button type="submit" class="btn btn-default" id="query-submit">Execute</button>
             </form>
 
         <#if error?has_content>

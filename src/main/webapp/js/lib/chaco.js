@@ -43,8 +43,20 @@ var chaco_tree = (function () {
                 node.setLazyNodeStatus(DTNodeStatus_Ok);
                 node.render();
             });
+        },
+        onCreate: function (node, span) {
+            if (node.data.table) {
+                $(span).contextMenu({menu: "tableMenu"}, function (action, el, pos) {
+                    table = node.data.table;
+                    schemaName = node.parent.data.schemaName;
+                    if (action === "select") {
+                        query = "SELECT * FROM " + schemaName + "." + table + " LIMIT 100";
+                        $("#query").val(query);
+                        $("#query-submit").click();
+                    }
+                });
+            }
         }
-
     });
     return tree;
 });
