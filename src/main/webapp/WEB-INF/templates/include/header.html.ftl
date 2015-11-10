@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>chaco</title>
-    <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="static/dynatree/css/ui.dynatree.css" rel="stylesheet">
-    <link href="static/jquery-ui/css/jquery-ui.min.css" rel="stylesheet">
-    <script src="static/js/jquery-2.1.1.min.js"></script>
-    <script src="static/jquery-ui/js/jquery-ui.min.js"></script>
-    <script src="static/dynatree/js/jquery.dynatree.min.js"></script>
-    <script src="static/chaco/js/chaco.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/ui.dynatree.css" rel="stylesheet">
+    <link href="css/jquery.contextMenu.css" rel="stylesheet">
+    <link href="css/jquery-ui.min.css" rel="stylesheet">
+    <script src="js/lib/jquery.js"></script>
+    <script src="js/lib/jquery-ui.min.js"></script>
+    <script src="js/lib/bootstrap.min.js"></script>
+    <script src="js/lib/jquery.dynatree.min.js"></script>
+    <script src="js/lib/jquery.contextMenu-custom.js"></script>
+    <script src="js/lib/chaco.js"></script>
 </head>
 <body>
 

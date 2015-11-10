@@ -32,7 +32,7 @@ public class GuiceServletConfig extends GuiceServletContextListener {
 			new ServletModule() {
 				@Override
 				protected void configureServlets() {
-					serve("/static/*", "/components/*").with(DefaultServlet.class);
+					serve("/img/*", "/css/*", "/js/*").with(DefaultServlet.class);
 					serve("/*").with(Servlet.class);
 				}
 			});
