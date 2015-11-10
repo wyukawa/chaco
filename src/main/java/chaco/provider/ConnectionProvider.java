@@ -16,14 +16,6 @@ import chaco.config.Config;
 @Slf4j
 public class ConnectionProvider implements Provider<Connection> {
 
-	static {
-		try {
-			Class.forName("org.postgresql.Driver");
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@Inject
 	private Config config;
 
