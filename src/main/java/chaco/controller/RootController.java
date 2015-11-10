@@ -2,9 +2,6 @@ package chaco.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -18,18 +15,18 @@ import me.geso.avans.annotation.POST;
 import me.geso.avans.annotation.Param;
 import me.geso.webscrew.response.WebResponse;
 
-import chaco.service.NetezzaService;
+import chaco.service.JdbcService;
 
 @Slf4j
 public class RootController extends BaseController {
 
     @Inject
-    private NetezzaService netezzaService;
+    private JdbcService jdbcService;
 
     @GET("/")
     public WebResponse index() throws IOException, TemplateException {
         return this.freemarker("index.html.ftl")
-                .param("schemaNames", netezzaService.getSchemaNames())
+                .param("schemaNames", jdbcService.getSchemaNames())
                 .param("query", "")
                 .param("rows", ImmutableList.of())
                 .param("error", "")
@@ -38,12 +35,12 @@ public class RootController extends BaseController {
 
     @GET("/catalogNames")
     public WebResponse getCatalogNames() {
-        return this.renderJSON(ImmutableMap.builder().put("catalogs", netezzaService.getCatalogNames()).build());
+        return this.renderJSON(ImmutableMap.builder().put("catalogs", jdbcService.getCatalogNames()).build());
     }
 
     @GET("/schemaNames")
     public WebResponse getSchemaNames() {
-        return this.renderJSON(ImmutableMap.builder().put("schemaNames", netezzaService.getSchemaNames()).build());
+        return this.renderJSON(ImmutableMap.builder().put("schemaNames", jdbcService.getSchemaNames()).build());
     }
 
     @GET("/tableNames")
@@ -53,7 +50,7 @@ public class RootController extends BaseController {
             return this.renderJSON(ImmutableMap.builder().put("error", "catalog and schema parameters are required").build());
         }
 
-        return this.renderJSON(ImmutableMap.builder().put("tableNames", netezzaService.getTableNames(catalogOptional.get(), schemaOptinal.get())).build());
+        return this.renderJSON(ImmutableMap.builder().put("tableNames", jdbcService.getTableNames(catalogOptional.get(), schemaOptinal.get())).build());
 
     }
 
@@ -62,15 +59,15 @@ public class RootController extends BaseController {
 
         try {
             return this.freemarker("index.html.ftl")
-                    .param("schemaNames", netezzaService.getSchemaNames())
+                    .param("schemaNames", jdbcService.getSchemaNames())
                     .param("query", queryOptional.orElse(""))
-                    .param("rows", netezzaService.getResultRows(queryOptional.orElse("")))
+                    .param("rows", jdbcService.getResultRows(queryOptional.orElse("")))
                     .param("error", "")
                     .render();
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.freemarker("index.html.ftl")
-                    .param("schemaNames", netezzaService.getSchemaNames())
+                    .param("schemaNames", jdbcService.getSchemaNames())
                     .param("query", queryOptional.orElse(""))
                     .param("rows", ImmutableList.of())
                     .param("error", e.getMessage())

@@ -13,11 +13,11 @@ import java.util.List;
 /**
  * This is a chaco service class.
  */
-public class NetezzaService {
+public class JdbcService {
     private final Connection connection;
 
     @Inject
-    public NetezzaService(Connection connection) {
+    public JdbcService(Connection connection) {
         this.connection = connection;
     }
 
