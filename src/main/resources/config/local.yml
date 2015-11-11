@@ -3,6 +3,7 @@ development: true
 jdbc:
   driver: org.postgresql.Driver
   url: jdbc:postgresql://localhost:5432/test
+  catalog: test
   username: test_user
   password: test_user
 

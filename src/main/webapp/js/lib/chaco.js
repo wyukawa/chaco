@@ -22,7 +22,7 @@ var chaco_tree = (function () {
             var schemaName = node.data.key;
             $.ajax({
                 url: "tableNames",
-                data: {catalog: "test", schema: schemaName},
+                data: {schema: schemaName},
                 type: "GET",
                 dataType: "json"
             }).done(function (data) {

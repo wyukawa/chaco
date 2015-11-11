@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import chaco.config.Config;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import freemarker.template.TemplateException;
@@ -21,6 +22,9 @@ import chaco.service.JdbcService;
 public class RootController extends BaseController {
 
     @Inject
+    private Config config;
+
+    @Inject
     private JdbcService jdbcService;
 
     @GET("/")
@@ -33,24 +37,19 @@ public class RootController extends BaseController {
                 .render();
     }
 
-    @GET("/catalogNames")
-    public WebResponse getCatalogNames() {
-        return this.renderJSON(ImmutableMap.builder().put("catalogs", jdbcService.getCatalogNames()).build());
-    }
-
     @GET("/schemaNames")
     public WebResponse getSchemaNames() {
         return this.renderJSON(ImmutableMap.builder().put("schemaNames", jdbcService.getSchemaNames()).build());
     }
 
     @GET("/tableNames")
-    public WebResponse getTableNames(@Param("catalog") Optional<String> catalogOptional, @Param("schema") Optional<String> schemaOptinal) {
+    public WebResponse getTableNames(@Param("schema") Optional<String> schemaOptinal) {
 
-        if (!catalogOptional.isPresent() || !schemaOptinal.isPresent()) {
-            return this.renderJSON(ImmutableMap.builder().put("error", "catalog and schema parameters are required").build());
+        if (!schemaOptinal.isPresent()) {
+            return this.renderJSON(ImmutableMap.builder().put("error", "schema parameter is required").build());
         }
 
-        return this.renderJSON(ImmutableMap.builder().put("tableNames", jdbcService.getTableNames(catalogOptional.get(), schemaOptinal.get())).build());
+        return this.renderJSON(ImmutableMap.builder().put("tableNames", jdbcService.getTableNames(config.getJdbc().getCatalog(), schemaOptinal.get())).build());
 
     }
 
