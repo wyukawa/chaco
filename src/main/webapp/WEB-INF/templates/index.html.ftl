@@ -19,33 +19,20 @@
             </script>
         </td>
         <td>
-            <form action="/query" method="post">
+            <form>
                 <div class="form-group">
-                    <label>SQL</label>
-                    <textarea class="form-control" rows="3" cols="150" id="query" name="query">${query}</textarea>
+                    <label>Query</label>
+                    <textarea class="form-control" rows="3" cols="150" id="query"></textarea>
                 </div>
-                <button type="submit" class="btn btn-default" id="query-submit">Execute</button>
+                <button type="button" onclick="handle_execute()" class="btn btn-primary" id="query-submit">Execute</button>
             </form>
 
-        <#if error?has_content>
-            <div class="alert alert-danger" role="alert">${error}</div>
-        </#if>
+            <div class="alert alert-danger" id="error-msg"></div>
+            <script>
+                $("#error-msg").hide();
+            </script>
 
-            <table class="table table-bordered">
-                <thead>
-                <#list rows as row>
-                <tr>
-                    <#list row as column>
-                        <#if column??>
-                            <td>${column}</td>
-                        <#else>
-                            <td>null</td>
-                        </#if>
-                    </#list>
-                </tr>
-                </#list>
-                </thead>
-            </table>
+            <table class="table table-bordered" id="query-results"></table>
         </td>
     </tr>
 

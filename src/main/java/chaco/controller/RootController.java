@@ -30,10 +30,6 @@ public class RootController extends BaseController {
     @GET("/")
     public WebResponse index() throws IOException, TemplateException {
         return this.freemarker("index.html.ftl")
-                .param("schemaNames", jdbcService.getSchemaNames())
-                .param("query", "")
-                .param("rows", ImmutableList.of())
-                .param("error", "")
                 .render();
     }
 
@@ -57,20 +53,10 @@ public class RootController extends BaseController {
     public WebResponse query(@Param("query") Optional<String> queryOptional) throws IOException, TemplateException {
 
         try {
-            return this.freemarker("index.html.ftl")
-                    .param("schemaNames", jdbcService.getSchemaNames())
-                    .param("query", queryOptional.orElse(""))
-                    .param("rows", jdbcService.getResultRows(queryOptional.orElse("")))
-                    .param("error", "")
-                    .render();
+            return this.renderJSON(ImmutableMap.builder().put("rows", jdbcService.getResultRows(queryOptional.orElse(""))).build());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
-            return this.freemarker("index.html.ftl")
-                    .param("schemaNames", jdbcService.getSchemaNames())
-                    .param("query", queryOptional.orElse(""))
-                    .param("rows", ImmutableList.of())
-                    .param("error", e.getMessage())
-                    .render();
+            return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
         }
 
     }
