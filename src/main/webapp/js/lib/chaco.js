@@ -96,6 +96,13 @@ var handle_execute = (function () {
     var div = $("<div></div>", {style: "overflow:auto;", id: "query-results-div"});
     div.append($("<table></table>", {class: "table table-bordered", id: "query-results"}));
     $("#query-results-tab").append(div);
+    var tr = document.createElement("tr");
+    var td = document.createElement("td");
+    var img = document.createElement("img");
+    $(img).attr("src", "img/loading_long_48.gif");
+    $(td).append(img);
+    $(tr).append(td);
+    $("#query-results").append(tr);
     var query = $("#query").val();
     var requestURL = "/query";
     var requestData = {
