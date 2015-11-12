@@ -32,7 +32,11 @@
                 $("#error-msg").hide();
             </script>
 
-            <table class="table table-bordered" id="query-results"></table>
+            <h4>query results</h4>
+
+            <div id="query-results-div">
+                <table class="table table-bordered" id="query-results"></table>
+            </div>
         </td>
     </tr>
 

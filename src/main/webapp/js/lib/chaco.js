@@ -62,37 +62,57 @@ var chaco_tree = (function () {
 });
 
 var handle_execute = (function () {
+    $("#query-submit").attr("disabled", "disabled");
     $("#error-msg").hide();
-    $("#query-results").empty();
+    $("#query-results").remove();
+    $("#query-results-div").append($("<table></table>", {class: "table table-bordered", id: "query-results"}));
     var query = $("#query").val();
     var requestURL = "/query";
     var requestData = {
         "query": query
     };
     var successHandler = function (data) {
+        $("#query-submit").removeAttr("disabled");
         if (data.error) {
             $("#error-msg").text(data.error);
             $("#error-msg").slideDown("fast");
 
         } else {
+            $("#query-results").empty();
+            var columnNames = data.columnNames;
             var rows = data.rows;
-            var tbody = document.createElement("tbody");
-            for (var i = 0; i < rows.length; i++) {
-                var tr = document.createElement("tr");
-                var columns = rows[i];
-                for (var j = 0; j < columns.length; j++) {
-                    var td = document.createElement("td");
-                    if (typeof columns[j] == "object") {
-                        $(td).text(JSON.stringify(columns[j]));
-                    } else {
-                        $(td).text(columns[j]);
-                    }
-                    $(tr).append(td);
-                }
-                $(tbody).append(tr);
-            }
-            $("#query-results").append(tbody);
+            create_table("#query-results", columnNames, rows);
         }
     };
     $.post(requestURL, requestData, successHandler, "json");
+});
+
+var create_table = (function (table_id, columnNames, rows) {
+    var thead = document.createElement("thead");
+    var tr = document.createElement("tr");
+    for (var i = 0; i < columnNames.length; ++i) {
+        var th = document.createElement("th");
+        $(th).text(columnNames[i]);
+        $(tr).append(th);
+    }
+    $(thead).append(tr);
+    $(table_id).append(thead);
+    var tbody = document.createElement("tbody");
+    for (var i = 0; i < rows.length; ++i) {
+        var tr = document.createElement("tr");
+        var columns = rows[i];
+        for (var j = 0; j < columns.length; ++j) {
+            var td = document.createElement("td");
+            if (typeof columns[j] == "object") {
+                $(td).text(JSON.stringify(columns[j]));
+            } else {
+                $(td).text(columns[j]);
+            }
+            $(tr).append(td);
+        }
+        $(tbody).append(tr);
+    }
+    $(table_id).append(tbody);
+    $(table_id).tablefix({height: 600, fixRows: 1});
+
 });

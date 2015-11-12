@@ -1,5 +1,6 @@
 package chaco.service;
 
+import chaco.QueryResult;
 import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
@@ -21,22 +22,28 @@ public class JdbcService {
         this.connection = connection;
     }
 
-    public List<List<String>> getResultRows(String query) throws SQLException{
-        ImmutableList.Builder<List<String>> resultRows = ImmutableList.builder();
+    public QueryResult getQueryResult(String query) throws SQLException{
+        ImmutableList.Builder<List<String>> rows = ImmutableList.builder();
+        ImmutableList.Builder<String> columnNames = ImmutableList.builder();
         try (PreparedStatement stmt = this.connection.prepareStatement(query)) {
             try (ResultSet resultSet = stmt.executeQuery()) {
-                int columnCount = stmt.getMetaData().getColumnCount();
+                ResultSetMetaData metaData = stmt.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnLabel(i);
+                    columnNames.add(columnName);
+                }
                 while (resultSet.next()) {
                     List<String> columns = new ArrayList<>();
                     for (int i = 1; i <= columnCount; i++) {
                         String column = resultSet.getString(i);
                         columns.add(column);
                     }
-                    resultRows.add(columns);
+                    rows.add(columns);
                 }
             }
         }
-        return resultRows.build();
+        return new QueryResult(rows.build(), columnNames.build());
     }
 
     public List<String> getTableNames(String catalog, String schemaPattern) {

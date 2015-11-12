@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import chaco.QueryResult;
 import chaco.config.Config;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -53,7 +54,8 @@ public class RootController extends BaseController {
     public WebResponse query(@Param("query") Optional<String> queryOptional) throws IOException, TemplateException {
 
         try {
-            return this.renderJSON(ImmutableMap.builder().put("rows", jdbcService.getResultRows(queryOptional.orElse(""))).build());
+            QueryResult queryResult = jdbcService.getQueryResult(queryOptional.orElse(""));
+            return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).build());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());

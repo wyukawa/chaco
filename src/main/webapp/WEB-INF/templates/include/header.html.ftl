@@ -12,6 +12,7 @@
     <script src="js/lib/bootstrap.min.js"></script>
     <script src="js/lib/jquery.dynatree.min.js"></script>
     <script src="js/lib/jquery.contextMenu-custom.js"></script>
+    <script src="js/lib/jquery.tablefix_1.0.1.js"></script>
     <script src="js/lib/chaco.js"></script>
 </head>
 <body>
