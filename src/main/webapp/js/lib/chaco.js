@@ -64,8 +64,10 @@ var chaco_tree = (function () {
 var handle_execute = (function () {
     $("#query-submit").attr("disabled", "disabled");
     $("#error-msg").hide();
-    $("#query-results").remove();
-    $("#query-results-div").append($("<table></table>", {class: "table table-bordered", id: "query-results"}));
+    $("#query-results-div").remove();
+    var div = $("<div></div>", {style: "overflow:auto;", id: "query-results-div"});
+    div.append($("<table></table>", {class: "table table-bordered", id: "query-results"}));
+    $("#query-results-tab").append(div);
     var query = $("#query").val();
     var requestURL = "/query";
     var requestData = {

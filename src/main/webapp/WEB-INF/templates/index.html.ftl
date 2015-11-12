@@ -34,8 +34,10 @@
 
             <h4>query results</h4>
 
-            <div id="query-results-div">
-                <table class="table table-bordered" id="query-results"></table>
+            <div id="query-results-tab">
+                <div id="query-results-div">
+                    <table class="table table-bordered" id="query-results"></table>
+                </div>
             </div>
         </td>
     </tr>
