@@ -115,6 +115,6 @@ var create_table = (function (table_id, columnNames, rows) {
         $(tbody).append(tr);
     }
     $(table_id).append(tbody);
-    $(table_id).tablefix({height: 600, fixRows: 1});
+    $(table_id).tablefix({fixRows: 1});
 
 });
