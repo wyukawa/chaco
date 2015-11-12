@@ -19,30 +19,58 @@ var chaco_tree = (function () {
             }
         },
         onLazyRead: function (node) {
-            var schemaName = node.data.key;
-            $.ajax({
-                url: "tableNames",
-                data: {schema: schemaName},
-                type: "GET",
-                dataType: "json"
-            }).done(function (data) {
-                if (data["error"]) {
-                    console.log(data["error"]);
-                    return;
-                }
-                var tableNames = data["tableNames"];
+            if (node.data.schemaName) {
+                var schemaName = node.data.key;
+                $.ajax({
+                    url: "tableNames",
+                    data: {schema: schemaName},
+                    type: "GET",
+                    dataType: "json"
+                }).done(function (data) {
+                    if (data["error"]) {
+                        console.log(data["error"]);
+                        return;
+                    }
+                    var tableNames = data["tableNames"];
 
-                for (var i = 0; i < tableNames.length; i++) {
-                    var tableName = tableNames[i];
-                    node.addChild({title: tableName, key: tableName, isLazy: true, isFolder: true, table: tableName});
-                }
+                    for (var i = 0; i < tableNames.length; i++) {
+                        var tableName = tableNames[i];
+                        node.addChild({title: tableName, key: tableName, isLazy: true, isFolder: true, table: tableName});
+                    }
+                    node.setLazyNodeStatus(DTNodeStatus_Ok);
+                }).fail(function () {
+                    node.data.isLazy = false;
+                    node.setLazyNodeStatus(DTNodeStatus_Ok);
+                    node.render();
+                });
+            } else if (node.parent.data.schemaName) {
+                var schemaName = node.parent.data.schemaName;
+                var tableName = node.data.key;
+                $.ajax({
+                    url: "columnNames",
+                    data: {schema: schemaName, table: tableName},
+                    type: "GET",
+                    dataType: "json"
+                }).done(function (data) {
+                    if (data["error"]) {
+                        console.log(data["error"]);
+                        return;
+                    }
+                    var columnNames = data["columnNames"];
 
-                node.setLazyNodeStatus(DTNodeStatus_Ok);
-            }).fail(function () {
-                node.data.isLazy = false;
-                node.setLazyNodeStatus(DTNodeStatus_Ok);
-                node.render();
-            });
+                    for (var i = 0; i < columnNames.length; i++) {
+                        var columnName = columnNames[i];
+                        node.addChild({title: columnName, key: columnName, isLazy: true, isFolder: false, table: columnName});
+                    }
+                    node.setLazyNodeStatus(DTNodeStatus_Ok);
+                }).fail(function () {
+                    node.data.isLazy = false;
+                    node.setLazyNodeStatus(DTNodeStatus_Ok);
+                    node.render();
+                });
+
+            }
+
         },
         onCreate: function (node, span) {
             if (node.data.table) {

@@ -85,4 +85,17 @@ public class JdbcService {
             throw new RuntimeException(e);
         }
     }
+
+    public List<String> getColumnNames(String catalog, String schemaPattern, String tableNamePattern) {
+        ImmutableList.Builder<String> columnNames = ImmutableList.builder();
+        try (ResultSet resultSet = this.connection.getMetaData().getColumns(catalog, schemaPattern, tableNamePattern, "%")) {
+            while (resultSet.next()) {
+                String columnName = resultSet.getString("COLUMN_NAME");
+                columnNames.add(columnName);
+            }
+            return columnNames.build();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -50,6 +50,17 @@ public class RootController extends BaseController {
 
     }
 
+    @GET("/columnNames")
+    public WebResponse getTableNames(@Param("schema") Optional<String> schemaOptinal, @Param("table") Optional<String> tableOptinal) {
+
+        if (schemaOptinal.isPresent() && tableOptinal.isPresent()) {
+            return this.renderJSON(ImmutableMap.builder().put("columnNames", jdbcService.getColumnNames(config.getJdbc().getCatalog(), schemaOptinal.get(), tableOptinal.get())).build());
+        } else {
+            return this.renderJSON(ImmutableMap.builder().put("error", "schema/table parameter is required").build());
+        }
+
+    }
+
     @POST("/query")
     public WebResponse query(@Param("query") Optional<String> queryOptional) throws IOException, TemplateException {
 
