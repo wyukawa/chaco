@@ -113,7 +113,7 @@ var handle_execute = (function () {
         if (data.error) {
             $("#error-msg").text(data.error);
             $("#error-msg").slideDown("fast");
-
+            $("#query-results").empty();
         } else {
             $("#query-results").empty();
             var columnNames = data.columnNames;
