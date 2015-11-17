@@ -35,10 +35,31 @@
             <h4>query results</h4>
 
             <div id="query-results-tab">
-                <div id="query-results-div">
+                <div style="height:500px; overflow:auto;" id="query-results-div">
                     <table class="table table-bordered" id="query-results"></table>
                 </div>
             </div>
+
+            <h4>query histories</h4>
+
+            <input type="text" size="20" id="search_query_histories">
+            <script>
+                $('#search_query_histories').keyup(function(){
+                    if ($(this).val()) {
+                        $('#query-histories tr').hide();
+                        $('#query-histories tr td:nth-child(3):contains(' + this.value + ')').parent().show();
+                    } else {
+                        $('#query-histories tr').show();
+                    }
+                });
+            </script>
+            <div>
+                <table class="table table-bordered" id="query-histories"></table>
+            </div>
+            <script>
+                update_query_histories_area();
+            </script>
+
         </td>
     </tr>
 
