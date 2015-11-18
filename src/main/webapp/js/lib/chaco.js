@@ -224,3 +224,26 @@ var delete_query = (function (event) {
     $("#query-histories").empty();
     update_query_histories_area();
 });
+
+var redraw = (function () {
+    $("#query-executions-div").remove();
+    var div = $("<div></div>", {style: "height:500px; overflow:auto;", id: "query-executions-div"});
+    div.append($("<table></table>", {class: "table table-bordered", id: "query-executions"}));
+    $("#query-executions-tab").append(div);
+    var requestURL = "/queryexecutions";
+    var requestData = {
+    };
+    var successHandler = function (data) {
+        if (data.error) {
+            $("#error-msg").text(data.error);
+            $("#error-msg").slideDown("fast");
+            $("#query-executions").empty();
+        } else {
+            $("#query-executions").empty();
+            var columnNames = data.columnNames;
+            var rows = data.rows;
+            create_table("#query-executions", columnNames, rows);
+        }
+    };
+    $.post(requestURL, requestData, successHandler, "json");
+});
