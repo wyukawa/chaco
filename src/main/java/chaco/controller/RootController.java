@@ -62,7 +62,7 @@ public class RootController extends BaseController {
     }
 
     @POST("/query")
-    public WebResponse query(@Param("query") Optional<String> queryOptional) throws IOException, TemplateException {
+    public WebResponse query(@Param("query") Optional<String> queryOptional) {
 
         try {
             QueryResult queryResult = jdbcService.getQueryResult(queryOptional.orElse(""));
