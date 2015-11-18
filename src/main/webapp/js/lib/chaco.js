@@ -228,7 +228,7 @@ var delete_query = (function (event) {
 
 var redraw = (function () {
     $("#query-executions-div").remove();
-    var div = $("<div></div>", {style: "height:500px; overflow:auto;", id: "query-executions-div"});
+    var div = $("<div></div>", {style: "overflow:auto;", id: "query-executions-div"});
     div.append($("<table></table>", {class: "table table-bordered", id: "query-executions"}));
     $("#query-executions-tab").append(div);
     var requestURL = "/queryexecutions";

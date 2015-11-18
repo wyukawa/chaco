@@ -55,7 +55,7 @@
                 </ul>
 
                 <div id="query-executions-tab">
-                    <div style="height:500px; overflow:auto;" id="query-executions-div">
+                    <div style="overflow:auto;" id="query-executions-div">
                         <table class="table table-bordered" id="query-executions"></table>
                     </div>
                 </div>
