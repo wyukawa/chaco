@@ -122,6 +122,7 @@ var handle_execute = (function () {
             var columnNames = data.columnNames;
             var rows = data.rows;
             create_table("#query-results", columnNames, rows);
+            redraw();
         }
     };
     $.post(requestURL, requestData, successHandler, "json");
