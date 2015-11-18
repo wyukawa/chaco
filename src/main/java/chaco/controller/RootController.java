@@ -78,14 +78,13 @@ public class RootController extends BaseController {
     public WebResponse queryexecutions() {
 
         try {
-            String query = null;
             if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
-                query = "SELECT * FROM _v_qryhist  WHERE QH_DATABASE='" + config.getJdbc().getCatalog() + "' ORDER BY QH_TSUBMIT DESC LIMIT 100";
+                String query = "SELECT * FROM _v_qryhist  WHERE QH_DATABASE='" + config.getJdbc().getCatalog() + "' ORDER BY QH_TSUBMIT DESC LIMIT 100";
+                QueryResult queryResult = jdbcService.getQueryResult(query);
+                return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).build());
             } else {
-                query = "SELECT * FROM test_schema.test_table";
+                return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().build()).put("rows", ImmutableList.builder().build()).build());
             }
-            QueryResult queryResult = jdbcService.getQueryResult(query);
-            return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).build());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
