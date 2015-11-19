@@ -240,7 +240,9 @@ var redraw = (function () {
             $("#running-query").empty();
             var columnNames = data.columnNames;
             var rows = data.rows;
-            create_table("#running-query", columnNames, rows);
+            if(rows.length > 0) {
+                create_table("#running-query", columnNames, rows);
+            }
         }
     });
 
