@@ -55,8 +55,12 @@
                 </ul>
 
                 <div id="query-executions-tab">
-                    <div style="overflow:auto;" id="query-executions-div">
-                        <table class="table table-bordered" id="query-executions"></table>
+                    <div style="overflow:auto;" id="running-query-div">
+                        <table class="table table-bordered" id="running-query"></table>
+                    </div>
+
+                    <div style="overflow:auto;" id="done-query-div">
+                        <table class="table table-bordered" id="done-query"></table>
                     </div>
                 </div>
 

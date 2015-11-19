@@ -74,12 +74,30 @@ public class RootController extends BaseController {
 
     }
 
-    @POST("/queryexecutions")
+    @GET("/donequery")
     public WebResponse queryexecutions() {
 
         try {
             if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
                 String query = "SELECT * FROM _v_qryhist  WHERE QH_DATABASE='" + config.getJdbc().getCatalog() + "' ORDER BY QH_TSUBMIT DESC LIMIT 100";
+                QueryResult queryResult = jdbcService.getQueryResult(query);
+                return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).build());
+            } else {
+                return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().build()).put("rows", ImmutableList.builder().build()).build());
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
+        }
+
+    }
+
+    @GET("/runningquery")
+    public WebResponse queryexecutions() {
+
+        try {
+            if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
+                String query = "SELECT * FROM _v_qrystat ORDER BY QS_TSUBMIT DESC";
                 QueryResult queryResult = jdbcService.getQueryResult(query);
                 return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).build());
             } else {

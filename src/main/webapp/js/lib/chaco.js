@@ -226,24 +226,38 @@ var delete_query = (function (event) {
 });
 
 var redraw = (function () {
-    var requestURL = "/queryexecutions";
-    var requestData = {
-    };
-    var successHandler = function (data) {
-        $("#query-executions-div").remove();
-        var div = $("<div></div>", {style: "overflow:auto;", id: "query-executions-div"});
-        div.append($("<table></table>", {class: "table table-bordered", id: "query-executions"}));
+    $.get("/donequery", {}, function (data) {
+        $("#done-query-div").remove();
+        var div = $("<div></div>", {style: "overflow:auto;", id: "done-query-div"});
+        div.append($("<table></table>", {class: "table table-bordered", id: "done-query"}));
         $("#query-executions-tab").append(div);
         if (data.error) {
             $("#error-msg").text(data.error);
             $("#error-msg").slideDown("fast");
-            $("#query-executions").empty();
+            $("#done-query").empty();
         } else {
-            $("#query-executions").empty();
+            $("#done-query").empty();
             var columnNames = data.columnNames;
             var rows = data.rows;
-            create_table("#query-executions", columnNames, rows);
+            create_table("#done-query", columnNames, rows);
         }
-    };
-    $.post(requestURL, requestData, successHandler, "json");
+    });
+
+    $.get("/runningquery", {}, function (data) {
+        $("#running-query-div").remove();
+        var div = $("<div></div>", {style: "overflow:auto;", id: "running-query-div"});
+        div.append($("<table></table>", {class: "table table-bordered", id: "running-query"}));
+        $("#query-executions-tab").append(div);
+        if (data.error) {
+            $("#error-msg").text(data.error);
+            $("#error-msg").slideDown("fast");
+            $("#running-query").empty();
+        } else {
+            $("#running-query").empty();
+            var columnNames = data.columnNames;
+            var rows = data.rows;
+            create_table("#running-query", columnNames, rows);
+        }
+    });
+
 });
