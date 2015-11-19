@@ -75,7 +75,7 @@ public class RootController extends BaseController {
     }
 
     @GET("/donequery")
-    public WebResponse queryexecutions() {
+    public WebResponse getDoneQuery() {
 
         try {
             if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
@@ -93,7 +93,7 @@ public class RootController extends BaseController {
     }
 
     @GET("/runningquery")
-    public WebResponse queryexecutions() {
+    public WebResponse getRunningQuery() {
 
         try {
             if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
