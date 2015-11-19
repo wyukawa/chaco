@@ -234,7 +234,7 @@ var redraw = (function () {
         } else {
             var columnNames = data.columnNames;
             var rows = data.rows;
-            if(len(rows) == 0) {
+            if(len(rows) > 0) {
                 $("#running-query-div").remove();
                 var div = $("<div></div>", {style: "overflow:auto;", id: "running-query-div"});
                 div.append($("<h4>Running Query</h4>"))
