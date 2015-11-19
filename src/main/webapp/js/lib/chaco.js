@@ -229,6 +229,7 @@ var redraw = (function () {
     $.get("/donequery", {}, function (data) {
         $("#done-query-div").remove();
         var div = $("<div></div>", {style: "overflow:auto;", id: "done-query-div"});
+        div.append($("<h4>Done Query</h4>"))
         div.append($("<table></table>", {class: "table table-bordered", id: "done-query"}));
         $("#query-executions-tab").append(div);
         if (data.error) {
@@ -246,6 +247,7 @@ var redraw = (function () {
     $.get("/runningquery", {}, function (data) {
         $("#running-query-div").remove();
         var div = $("<div></div>", {style: "overflow:auto;", id: "running-query-div"});
+        div.append($("<h4>Running Query</h4>"))
         div.append($("<table></table>", {class: "table table-bordered", id: "running-query"}));
         $("#query-executions-tab").append(div);
         if (data.error) {

@@ -55,12 +55,10 @@
                 </ul>
 
                 <div id="query-executions-tab">
-                    <h4>Running Query</h4>
                     <div style="overflow:auto;" id="running-query-div">
                         <table class="table table-bordered" id="running-query"></table>
                     </div>
 
-                    <h4>Done Query</h4>
                     <div style="overflow:auto;" id="done-query-div">
                         <table class="table table-bordered" id="done-query"></table>
                     </div>
