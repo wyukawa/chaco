@@ -122,7 +122,6 @@ var handle_execute = (function () {
             var columnNames = data.columnNames;
             var rows = data.rows;
             create_table("#query-results", columnNames, rows);
-            redraw();
         }
     };
     $.post(requestURL, requestData, successHandler, "json");
@@ -227,14 +226,14 @@ var delete_query = (function (event) {
 });
 
 var redraw = (function () {
-    $("#query-executions-div").remove();
-    var div = $("<div></div>", {style: "overflow:auto;", id: "query-executions-div"});
-    div.append($("<table></table>", {class: "table table-bordered", id: "query-executions"}));
-    $("#query-executions-tab").append(div);
     var requestURL = "/queryexecutions";
     var requestData = {
     };
     var successHandler = function (data) {
+        $("#query-executions-div").remove();
+        var div = $("<div></div>", {style: "overflow:auto;", id: "query-executions-div"});
+        div.append($("<table></table>", {class: "table table-bordered", id: "query-executions"}));
+        $("#query-executions-tab").append(div);
         if (data.error) {
             $("#error-msg").text(data.error);
             $("#error-msg").slideDown("fast");
