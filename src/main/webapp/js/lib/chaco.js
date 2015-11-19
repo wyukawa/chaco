@@ -226,24 +226,6 @@ var delete_query = (function (event) {
 });
 
 var redraw = (function () {
-    $.get("/donequery", {}, function (data) {
-        $("#done-query-div").remove();
-        var div = $("<div></div>", {style: "overflow:auto;", id: "done-query-div"});
-        div.append($("<h4>Done Query</h4>"))
-        div.append($("<table></table>", {class: "table table-bordered", id: "done-query"}));
-        $("#query-executions-tab").append(div);
-        if (data.error) {
-            $("#error-msg").text(data.error);
-            $("#error-msg").slideDown("fast");
-            $("#done-query").empty();
-        } else {
-            $("#done-query").empty();
-            var columnNames = data.columnNames;
-            var rows = data.rows;
-            create_table("#done-query", columnNames, rows);
-        }
-    });
-
     $.get("/runningquery", {}, function (data) {
         $("#running-query-div").remove();
         var div = $("<div></div>", {style: "overflow:auto;", id: "running-query-div"});
@@ -259,6 +241,24 @@ var redraw = (function () {
             var columnNames = data.columnNames;
             var rows = data.rows;
             create_table("#running-query", columnNames, rows);
+        }
+    });
+
+    $.get("/donequery", {}, function (data) {
+        $("#done-query-div").remove();
+        var div = $("<div></div>", {style: "overflow:auto;", id: "done-query-div"});
+        div.append($("<h4>Done Query</h4>"))
+        div.append($("<table></table>", {class: "table table-bordered", id: "done-query"}));
+        $("#query-executions-tab").append(div);
+        if (data.error) {
+            $("#error-msg").text(data.error);
+            $("#error-msg").slideDown("fast");
+            $("#done-query").empty();
+        } else {
+            $("#done-query").empty();
+            var columnNames = data.columnNames;
+            var rows = data.rows;
+            create_table("#done-query", columnNames, rows);
         }
     });
 
