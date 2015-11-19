@@ -228,15 +228,15 @@ var delete_query = (function (event) {
 var redraw = (function () {
     $.get("/runningquery", {}, function (data) {
         $("#running-query-div").remove();
-        var div = $("<div></div>", {style: "overflow:auto;", id: "running-query-div"});
-        div.append($("<h4>Running Query</h4>"))
-        div.append($("<table></table>", {class: "table table-bordered", id: "running-query"}));
-        $("#query-executions-tab").append(div);
         if (data.error) {
             $("#error-msg").text(data.error);
             $("#error-msg").slideDown("fast");
             $("#running-query").empty();
         } else {
+            var div = $("<div></div>", {style: "overflow:auto;", id: "running-query-div"});
+            div.append($("<h4>Running Query</h4>"))
+            div.append($("<table></table>", {class: "table table-bordered", id: "running-query"}));
+            $("#query-executions-tab").append(div);
             $("#running-query").empty();
             var columnNames = data.columnNames;
             var rows = data.rows;
