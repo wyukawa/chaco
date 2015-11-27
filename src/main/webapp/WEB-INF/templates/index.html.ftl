@@ -23,7 +23,22 @@
                 <div class="form-group">
                     <div class="col-sm-10">
                         <h4>query</h4>
-                        <textarea rows="10" cols="150" id="query"></textarea>
+                        <textarea rows="10" cols="150" id="query">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        </textarea>
                         <script>
                             $(function () {
                                 window.editor = CodeMirror.fromTextArea(document.getElementById('query'), {
