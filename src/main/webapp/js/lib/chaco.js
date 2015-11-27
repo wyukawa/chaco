@@ -130,6 +130,12 @@ var handle_execute = (function () {
 var create_table = (function (table_id, columnNames, rows) {
     var thead = document.createElement("thead");
     var tr = document.createElement("tr");
+
+    if(table_id == "#running-query") {
+        var kill_th = document.createElement("th");
+        $(tr).append(kill_th);
+    }
+
     for (var i = 0; i < columnNames.length; ++i) {
         var th = document.createElement("th");
         $(th).text(columnNames[i]);
@@ -141,6 +147,14 @@ var create_table = (function (table_id, columnNames, rows) {
     for (var i = 0; i < rows.length; ++i) {
         var tr = document.createElement("tr");
         var columns = rows[i];
+        
+        if(table_id == "#running-query") {
+            var session_id = columns[0];
+            var kill_td = document.createElement("td");
+            $(kill_td).append('<button type="button" id="query-submit" onclick="kill(' + session_id + ')" class="btn btn-primary">kill</button>');
+            $(tr).append(kill_td);
+        }
+
         for (var j = 0; j < columns.length; ++j) {
             var td = document.createElement("td");
             if (typeof columns[j] == "object") {
@@ -264,4 +278,13 @@ var redraw = (function () {
         }
     });
 
+});
+
+var kill = (function (session_id) {
+    $.post("/update", {query: "DROP SESSIOJN " + session_id}, function (data) {
+        if (data.error) {
+            $("#error-msg").text(data.error);
+            $("#error-msg").slideDown("fast");
+        }
+    });
 });
