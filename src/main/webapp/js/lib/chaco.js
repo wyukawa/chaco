@@ -79,7 +79,7 @@ var chaco_tree = (function () {
                     schemaName = node.parent.data.schemaName;
                     if (action === "select") {
                         query = "SELECT * FROM " + schemaName + "." + table + " LIMIT 100";
-                        $("#query").val(query);
+                        window.editor.setValue(query);
                         $("#query-submit").click();
                     }
                 });
@@ -103,7 +103,7 @@ var handle_execute = (function () {
     $(td).append(img);
     $(tr).append(td);
     $("#query-results").append(tr);
-    var query = $("#query").val();
+    var query = window.editor.getValue();
     var requestURL = "/query";
     var requestData = {
         "query": query
@@ -213,7 +213,7 @@ var update_query_histories_area = (function () {
 });
 
 var copy_query = (function (event) {
-    $("#query").val(event.data.query);
+    window.editor.setValue(event.data.query);
 });
 
 var delete_query = (function (event) {

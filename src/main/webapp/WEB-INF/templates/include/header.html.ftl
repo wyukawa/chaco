@@ -7,12 +7,18 @@
     <link href="css/ui.dynatree.css" rel="stylesheet">
     <link href="css/jquery.contextMenu.css" rel="stylesheet">
     <link href="css/jquery-ui.min.css" rel="stylesheet">
+    <link href="css/codemirror.css" rel="stylesheet">
+    <link href="css/show-hint.css" rel="stylesheet">
     <script src="js/lib/jquery.js"></script>
     <script src="js/lib/jquery-ui.min.js"></script>
     <script src="js/lib/bootstrap.min.js"></script>
     <script src="js/lib/jquery.dynatree.min.js"></script>
     <script src="js/lib/jquery.contextMenu-custom.js"></script>
     <script src="js/lib/jquery.tablefix_1.0.1.js"></script>
+    <script src="js/lib/codemirror.js"></script>
+    <script src="js/lib/show-hint.js"></script>
+    <script src="js/lib/sql.js"></script>
+    <script src="js/lib/sql-hint.js"></script>
     <script src="js/lib/chaco.js"></script>
 </head>
 <body>

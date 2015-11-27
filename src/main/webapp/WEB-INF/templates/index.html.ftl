@@ -19,12 +19,29 @@
             </script>
         </td>
         <td>
-            <form>
+            <form id="query-form" class="form-horizontal">
                 <div class="form-group">
-                    <label>Query</label>
-                    <textarea class="form-control" rows="3" cols="150" id="query"></textarea>
+                    <div class="col-sm-10">
+                        <h4>query</h4>
+                        <textarea rows="10" cols="150" id="query"></textarea>
+                        <script>
+                            $(function () {
+                                window.editor = CodeMirror.fromTextArea(document.getElementById('query'), {
+                                    mode: "text/x-mysql",
+                                    lineNumbers: true,
+                                    extraKeys: {"Ctrl-Space": "autocomplete"},
+                                });
+                            });
+                        </script>
+                    </div>
                 </div>
-                <button type="button" onclick="handle_execute()" class="btn btn-primary" id="query-submit">Execute</button>
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <button type="button" id="query-submit" onclick="handle_execute()" class="btn btn-primary">
+                            execute
+                        </button>
+                    </div>
+                </div>
             </form>
 
             <div class="alert alert-danger" id="error-msg"></div>
