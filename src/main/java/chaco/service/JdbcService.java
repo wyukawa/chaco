@@ -98,4 +98,10 @@ public class JdbcService {
             throw new RuntimeException(e);
         }
     }
+
+    public int update(String query) throws SQLException {
+        try (PreparedStatement stmt = this.connection.prepareStatement(query)) {
+            return stmt.executeUpdate();
+        }
+    }
 }

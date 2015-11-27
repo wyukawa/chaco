@@ -110,5 +110,18 @@ public class RootController extends BaseController {
 
     }
 
+    @POST("/update")
+    public WebResponse update(@Param("query") Optional<String> queryOptional) {
+
+        try {
+            int updateCount = jdbcService.update(queryOptional.orElse(""));
+            return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().add("update count").build()).put("rows", ImmutableList.builder().add(updateCount).build()).build());
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
+        }
+
+    }
+
 }
 
