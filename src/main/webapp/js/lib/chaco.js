@@ -281,7 +281,7 @@ var redraw = (function () {
 });
 
 var kill = (function (session_id) {
-    $.post("/update", {query: "DROP SESSIOJN " + session_id}, function (data) {
+    $.post("/update", {query: "DROP SESSION " + session_id}, function (data) {
         if (data.error) {
             $("#error-msg").text(data.error);
             $("#error-msg").slideDown("fast");
