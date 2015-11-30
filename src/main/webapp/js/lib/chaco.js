@@ -298,3 +298,7 @@ var kill = (function (session_id) {
         }
     });
 });
+
+var query_clear = (function () {
+    window.editor.setValue("");
+});

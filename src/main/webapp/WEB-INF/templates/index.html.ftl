@@ -45,6 +45,9 @@
                         <button type="button" id="query-submit" onclick="handle_execute()" class="btn btn-primary">
                             execute
                         </button>
+                        <button type="button" id="query-clear" onclick="query_clear()" class="btn btn-info">
+                            clear
+                        </button>
                     </div>
                 </div>
             </form>
