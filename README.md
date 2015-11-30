@@ -1,6 +1,6 @@
 Chaco
 ======
-Chaco is a WEB UI for DB operation like MySQL Workbench.
+Chaco is a WEB UI for Netezza operation like MySQL Workbench.
 
 Chaco comes from `The Story on a Seashore for Chaco` that is the music name of Japanese famous rock band `Southern All Stars`
 
@@ -21,6 +21,6 @@ Edit configuration file
 Start the server
 ----------------
 
-    mvn jetty:run -Dchaco.env=local
+    mvn -P netezza jetty:run -Dchaco.env=local
 
 see http://localhost:8080/ 
