@@ -89,6 +89,11 @@ var chaco_tree = (function () {
     return tree;
 });
 
+
+var removeNewLinesAndComments = (function(str){
+    return str.replace(/--.*$/mg, '').split(/\r\n|\r|\n/).join(' ');
+});
+
 var handle_execute = (function () {
     $("#query-submit").attr("disabled", "disabled");
     $("#error-msg").hide();
@@ -104,7 +109,12 @@ var handle_execute = (function () {
     $(tr).append(td);
     $("#query-results").append(tr);
     var query = window.editor.getValue();
-    var requestURL = "/query";
+    var requestURL;
+    if (/^\s*(with .*)?\s*(explain\s+)?select .* from .+$/i.exec(removeNewLinesAndComments(query))){
+        requestURL = "/query";
+    } else {
+        requestURL = "/update";
+    }
     var requestData = {
         "query": query
     };
