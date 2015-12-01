@@ -20,6 +20,19 @@
     <script src="js/lib/sql.js"></script>
     <script src="js/lib/sql-hint.js"></script>
     <script src="js/lib/chaco.js"></script>
+    <script>
+        $(function(){
+            follow_current_uri();
+            window.addEventListener("popstate", function (event) {
+                if (event.state === null || event.state === undefined || event.state.length != 32) {
+                    return;
+                }
+                var queryid = event.state;
+                follow_current_uri_query(queryid);
+            }, false);
+        });
+    </script>
+
 </head>
 <body>
 

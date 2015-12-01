@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -76,7 +77,7 @@ public class RootController extends BaseController {
             String query = queryOptional.orElse("");
             String queryId = store(query);
             QueryResult queryResult = jdbcService.getQueryResult(query);
-            return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("query_id", queryId).build());
+            return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("queryid", queryId).build());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
@@ -128,10 +129,33 @@ public class RootController extends BaseController {
             store(query);
             String queryId = store(query);
             int updateCount = jdbcService.update(query);
-            return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().add("update count").build()).put("rows", ImmutableList.builder().add(updateCount).build()).put("query_id", queryId).build());
+            return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().add("update count").build()).put("rows", ImmutableList.builder().add(updateCount).build()).put("queryid", queryId).build());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
+        }
+
+    }
+
+    @GET("/history")
+    public WebResponse getHistory(@Param("queryid") Optional<String> queryidOptional) {
+
+        if(!queryidOptional.isPresent()) {
+            return this.renderJSON(ImmutableMap.builder().build());
+        }
+
+        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:data/chaco.db")) {
+            String query = "SELECT query_id, fetch_result_time_string, query_string FROM query WHERE query_id=?";
+            try(PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, queryidOptional.get());
+                try(ResultSet rs = statement.executeQuery()) {
+                    rs.next();
+                    String queryString = rs.getString("query_string");
+                    return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).build());
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
     }

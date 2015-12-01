@@ -125,6 +125,7 @@ var handle_execute = (function () {
             $("#error-msg").slideDown("fast");
             $("#query-results").empty();
         } else {
+            update_history_by_query(data.queryid);
             push_query(query);
             $("#query-histories").empty();
             update_query_histories_area();
@@ -302,3 +303,28 @@ var kill = (function (session_id) {
 var query_clear = (function () {
     window.editor.setValue("");
 });
+
+function update_history_by_query(queryid) {
+    if (! window.history.pushState ) // if pushState not ready
+        return;
+    if (queryid === null) {
+        window.history.pushState('','', '/');
+        return;
+    }
+    window.history.pushState(queryid, '', '?queryid=' + queryid);
+};
+
+function follow_current_uri() {
+    var param = document.location.search.substring(1);
+    if (param === null) {
+        return;
+    }
+    var element = param.split('=');
+    follow_current_uri_query(element[1]);
+};
+
+function follow_current_uri_query(queryid){
+    $.get("/history", {queryid: queryid}, function (data) {
+        window.editor.setValue(data.queryString);
+    });
+};
