@@ -13,6 +13,11 @@ import chaco.module.BasicModule;
 import chaco.module.WebModule;
 import chaco.module.WebRequestScopedModule;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 public class GuiceServletConfig extends GuiceServletContextListener {
 
 	private ServletContext servletContext;
@@ -21,6 +26,15 @@ public class GuiceServletConfig extends GuiceServletContextListener {
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		servletContext = servletContextEvent.getServletContext();
 		super.contextInitialized(servletContextEvent);
+		try {
+			try(Connection connection = DriverManager.getConnection("jdbc:sqlite:data/chaco.db")) {
+				try(Statement statement = connection.createStatement()) {
+					statement.executeUpdate("create table if not exists query (query_id text primary key, fetch_result_time_string text, query_string text)");
+				}
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

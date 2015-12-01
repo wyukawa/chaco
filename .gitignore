@@ -5,3 +5,4 @@
 /.idea/
 *.iml
 tomcat.0
+data/chaco.db

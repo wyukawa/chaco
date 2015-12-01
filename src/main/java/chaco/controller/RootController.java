@@ -1,15 +1,23 @@
 package chaco.controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
 import chaco.QueryResult;
 import chaco.config.Config;
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import me.geso.avans.annotation.GET;
@@ -65,7 +73,9 @@ public class RootController extends BaseController {
     public WebResponse query(@Param("query") Optional<String> queryOptional) {
 
         try {
-            QueryResult queryResult = jdbcService.getQueryResult(queryOptional.orElse(""));
+            String query = queryOptional.orElse("");
+            store(query);
+            QueryResult queryResult = jdbcService.getQueryResult(query);
             return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).build());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
@@ -114,11 +124,33 @@ public class RootController extends BaseController {
     public WebResponse update(@Param("query") Optional<String> queryOptional) {
 
         try {
-            int updateCount = jdbcService.update(queryOptional.orElse(""));
+            String query = queryOptional.orElse("");
+            store(query);
+            int updateCount = jdbcService.update(query);
             return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().add("update count").build()).put("rows", ImmutableList.builder().add(updateCount).build()).build());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
+        }
+
+    }
+
+    private void store(String query) {
+        final String now = ZonedDateTime.now().toString();
+        HashFunction hf = Hashing.md5();
+        HashCode hc = hf.newHasher().putString(query + ";" + now, Charsets.UTF_8).hash();
+        String query_id = hc.toString();
+        System.out.println(query_id);
+        System.out.println(query_id);
+
+        String insertQuery = "INSERT INTO query VALUES(\"" + query_id + "\", \"" + now + "\", \"" + query + "\")";
+
+        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:data/chaco.db")) {
+            try(PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                final int updateCount = statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
     }
