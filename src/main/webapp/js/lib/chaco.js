@@ -96,6 +96,7 @@ var removeNewLinesAndComments = (function(str){
 
 var handle_execute = (function () {
     $("#query-submit").attr("disabled", "disabled");
+    $("#tsv-download").attr("disabled", "disabled");
     $("#error-msg").hide();
     $("#warn-msg").hide();
     $("#query-results-div").remove();
@@ -138,6 +139,8 @@ var handle_execute = (function () {
             var columnNames = data.columnNames;
             var rows = data.rows;
             create_table("#query-results", columnNames, rows);
+            $("#tsv-download").removeAttr("disabled");
+            push_result(columnNames, rows);
         }
     };
     $.post(requestURL, requestData, successHandler, "json");
@@ -333,3 +336,38 @@ function follow_current_uri_query(queryid){
         window.editor.setValue(data.queryString);
     });
 };
+
+var push_result = (function (headers, rows) {
+    if (!window.sessionStorage) return;
+    window.sessionStorage.query_header = JSON.stringify(headers);
+    window.sessionStorage.query_result = JSON.stringify(rows);
+});
+
+var tsv_download = (function () {
+    var query_header_string = window.sessionStorage.query_header;
+    var query_result_string = window.sessionStorage.query_result;
+    var headers = JSON.parse(query_header_string);
+    var rows = JSON.parse(query_result_string);
+    var text = headers.join("\t");
+    text += "\n";
+    for (var i = 0; i < rows.length; ++i) {
+        var columns = rows[i];
+        for (var j = 0; j < columns.length; ++j) {
+            if (typeof columns[j] == "object") {
+                text += JSON.stringify(columns[j]);
+            } else {
+                text += columns[j];
+            }
+            if (j != columns.length - 1) {
+                text += "\t";
+            }
+        }
+        text += "\n";
+    }
+    var name = "result"
+    var blob = new Blob([text], {type: 'text/plain'})
+    var link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = name + '.tsv'
+    link.click()
+});

@@ -48,6 +48,9 @@
                         <button type="button" id="query-clear" onclick="query_clear()" class="btn btn-info">
                             clear
                         </button>
+                        <button type="button" id="tsv-download" onclick="tsv_download()" class="btn btn-default"
+                                disabled="disabled">download
+                        </button>
                     </div>
                 </div>
             </form>
