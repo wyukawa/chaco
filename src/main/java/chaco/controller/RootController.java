@@ -74,9 +74,9 @@ public class RootController extends BaseController {
 
         try {
             String query = queryOptional.orElse("");
-            store(query);
+            String queryId = store(query);
             QueryResult queryResult = jdbcService.getQueryResult(query);
-            return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).build());
+            return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("query_id", queryId).build());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
@@ -126,8 +126,9 @@ public class RootController extends BaseController {
         try {
             String query = queryOptional.orElse("");
             store(query);
+            String queryId = store(query);
             int updateCount = jdbcService.update(query);
-            return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().add("update count").build()).put("rows", ImmutableList.builder().add(updateCount).build()).build());
+            return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().add("update count").build()).put("rows", ImmutableList.builder().add(updateCount).build()).put("query_id", queryId).build());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
@@ -135,19 +136,18 @@ public class RootController extends BaseController {
 
     }
 
-    private void store(String query) {
+    private String store(String query) {
         final String now = ZonedDateTime.now().toString();
         HashFunction hf = Hashing.md5();
         HashCode hc = hf.newHasher().putString(query + ";" + now, Charsets.UTF_8).hash();
-        String query_id = hc.toString();
-        System.out.println(query_id);
-        System.out.println(query_id);
+        String queryId = hc.toString();
 
-        String insertQuery = "INSERT INTO query VALUES(\"" + query_id + "\", \"" + now + "\", \"" + query + "\")";
+        String insertQuery = "INSERT INTO query VALUES(\"" + queryId + "\", \"" + now + "\", \"" + query + "\")";
 
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:data/chaco.db")) {
             try(PreparedStatement statement = connection.prepareStatement(insertQuery)) {
                 final int updateCount = statement.executeUpdate();
+                return queryId;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
