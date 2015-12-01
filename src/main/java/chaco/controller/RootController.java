@@ -77,7 +77,12 @@ public class RootController extends BaseController {
             String query = queryOptional.orElse("");
             String queryId = store(query);
             QueryResult queryResult = jdbcService.getQueryResult(query);
-            return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("queryid", queryId).build());
+            Optional<String> warningMessageOptinal = Optional.ofNullable(queryResult.getWarningMessage());
+            if(warningMessageOptinal.isPresent()) {
+                return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("queryid", queryId).put("warn", warningMessageOptinal.get()).build());
+            } else {
+                return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("queryid", queryId).build());
+            }
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());

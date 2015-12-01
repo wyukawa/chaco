@@ -97,6 +97,7 @@ var removeNewLinesAndComments = (function(str){
 var handle_execute = (function () {
     $("#query-submit").attr("disabled", "disabled");
     $("#error-msg").hide();
+    $("#warn-msg").hide();
     $("#query-results-div").remove();
     var div = $("<div></div>", {style: "height:500px; overflow:auto;", id: "query-results-div"});
     div.append($("<table></table>", {class: "table table-bordered", id: "query-results"}));
@@ -125,6 +126,10 @@ var handle_execute = (function () {
             $("#error-msg").slideDown("fast");
             $("#query-results").empty();
         } else {
+            if (data.warn) {
+                $("#warn-msg").text(data.warn);
+                $("#warn-msg").slideDown("fast");
+            }
             update_history_by_query(data.queryid);
             push_query(query);
             $("#query-histories").empty();

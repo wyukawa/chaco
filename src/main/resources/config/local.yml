@@ -6,6 +6,7 @@ jdbc:
   catalog: test
   username: test_user
   password: test_user
+limit: 2000
 
 dataSource:
   minimumIdle: 8

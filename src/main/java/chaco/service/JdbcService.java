@@ -1,6 +1,7 @@
 package chaco.service;
 
 import chaco.QueryResult;
+import chaco.config.Config;
 import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
@@ -19,6 +20,9 @@ public class JdbcService {
     private final Connection connection;
 
     @Inject
+    private Config config;
+
+    @Inject
     public JdbcService(Connection connection) {
         this.connection = connection;
     }
@@ -34,6 +38,7 @@ public class JdbcService {
                     String columnName = metaData.getColumnLabel(i);
                     columnNames.add(columnName);
                 }
+                int rowSize = 0;
                 while (resultSet.next()) {
                     List<String> columns = new ArrayList<>();
                     for (int i = 1; i <= columnCount; i++) {
@@ -41,6 +46,13 @@ public class JdbcService {
                         columns.add(column);
                     }
                     rows.add(columns);
+                    rowSize++;
+
+                    if(rowSize >= config.getLimit()) {
+                        QueryResult queryResult = new QueryResult(rows.build(), columnNames.build());
+                        queryResult.setWarningMessage(String.format("row size is more than %d. So, fetch operation stopped.", config.getLimit()));
+                        return queryResult;
+                    }
                 }
             }
         }

@@ -53,8 +53,10 @@
             </form>
 
             <div class="alert alert-danger" id="error-msg"></div>
+            <div class="alert alert-warning" id="warn-msg"></div>
             <script>
                 $("#error-msg").hide();
+                $("#warn-msg").hide();
             </script>
 
             <h4>query results</h4>
