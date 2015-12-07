@@ -81,6 +81,45 @@ var chaco_tree = (function () {
                         query = "SELECT * FROM " + schemaName + "." + table + " LIMIT 100";
                         window.editor.setValue(query);
                         $("#query-submit").click();
+                    } else if (action === "show_view_ddl") {
+                        $("#query-submit").attr("disabled", "disabled");
+                        $("#tsv-download").attr("disabled", "disabled");
+                        $("#error-msg").hide();
+                        $("#warn-msg").hide();
+                        $("#query-results-div").remove();
+                        var div = $("<div></div>", {style: "height:500px; overflow:auto;", id: "query-results-div"});
+                        div.append($("<table></table>", {class: "table table-bordered", id: "query-results"}));
+                        $("#query-results-tab").append(div);
+                        var tr = document.createElement("tr");
+                        var td = document.createElement("td");
+                        var img = document.createElement("img");
+                        $(img).attr("src", "img/loading_long_48.gif");
+                        $(td).append(img);
+                        $(tr).append(td);
+                        $("#query-results").append(tr);
+                        var requestURL = "/showviewddl";
+                        var requestData = {
+                            "schema": schemaName,
+                            "table": table
+                        };
+                        var successHandler = function (data) {
+                            $("#query-submit").removeAttr("disabled");
+                            if (data.error) {
+                                $("#error-msg").text(data.error);
+                                $("#error-msg").slideDown("fast");
+                                $("#query-results").empty();
+                            } else {
+                                if (data.warn) {
+                                    $("#warn-msg").text(data.warn);
+                                    $("#warn-msg").slideDown("fast");
+                                }
+                                $("#query-results").empty();
+                                var columnNames = data.columnNames;
+                                var rows = data.rows;
+                                create_table("#query-results", columnNames, rows);
+                            }
+                        };
+                        $.get(requestURL, requestData, successHandler, "json");
                     }
                 });
             }

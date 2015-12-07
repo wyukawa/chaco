@@ -165,6 +165,22 @@ public class RootController extends BaseController {
 
     }
 
+    @GET("/showviewddl")
+    public WebResponse showViewDdl(@Param("schema") Optional<String> schemaOptinal, @Param("table") Optional<String> tableOptinal) {
+
+        if (schemaOptinal.isPresent() && tableOptinal.isPresent()) {
+            if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
+                String showViewDdlQuery = "SELECT DEFINITION FROM _v_view WHERE DATABASE='" + config.getJdbc().getCatalog() + "' AND SCHEMA='" + schemaOptinal.get() + "' AND VIEWNAME='" + tableOptinal.get() + "'";
+                return query(Optional.of(showViewDdlQuery));
+            } else {
+                return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().build()).put("rows", ImmutableList.builder().build()).build());
+            }
+        } else {
+            return this.renderJSON(ImmutableMap.builder().put("error", "schema/table parameter is required").build());
+        }
+
+    }
+
     private String store(String query) {
         final String now = ZonedDateTime.now().toString();
         HashFunction hf = Hashing.md5();

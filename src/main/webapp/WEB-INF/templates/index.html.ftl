@@ -9,6 +9,7 @@
 
             <ul id="tableMenu" class="contextMenu">
                 <li><a href="#select">SELECT ... LIMIT 100</a></li>
+                <li><a href="#show_view_ddl">SHOW VIEW DDL</a></li>
             </ul>
 
             <div id="tree">
