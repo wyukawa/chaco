@@ -117,6 +117,7 @@ var chaco_tree = (function () {
                                 var columnNames = data.columnNames;
                                 var rows = data.rows;
                                 create_table("#query-results", columnNames, rows);
+                                $("#tsv-download").removeAttr("disabled");
                             }
                         };
                         $.get(requestURL, requestData, successHandler, "json");
