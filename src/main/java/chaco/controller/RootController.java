@@ -27,6 +27,7 @@ import me.geso.avans.annotation.Param;
 import me.geso.webscrew.response.WebResponse;
 
 import chaco.service.JdbcService;
+import org.apache.openjpa.lib.jdbc.SQLFormatter;
 
 @Slf4j
 public class RootController extends BaseController {
@@ -171,7 +172,15 @@ public class RootController extends BaseController {
         if (schemaOptinal.isPresent() && tableOptinal.isPresent()) {
             if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
                 String showViewDdlQuery = "SELECT DEFINITION FROM _v_view WHERE DATABASE='" + config.getJdbc().getCatalog() + "' AND SCHEMA='" + schemaOptinal.get() + "' AND VIEWNAME='" + tableOptinal.get() + "'";
-                return query(Optional.of(showViewDdlQuery));
+                try {
+                    QueryResult queryResult = jdbcService.getQueryResult(showViewDdlQuery);
+                    String viewDDL = queryResult.getRows().get(0).get(0);
+                    Object formattedViewDDL = new SQLFormatter().prettyPrint(viewDDL);
+                    return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", ImmutableList.builder().add(formattedViewDDL).build()).build());
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                    return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
+                }
             } else {
                 return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().build()).put("rows", ImmutableList.builder().build()).build());
             }
