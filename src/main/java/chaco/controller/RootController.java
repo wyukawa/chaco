@@ -28,7 +28,6 @@ import me.geso.webscrew.response.WebResponse;
 
 import chaco.service.JdbcService;
 import org.apache.openjpa.lib.jdbc.SQLFormatter;
-import org.hibernate.engine.jdbc.internal.BasicFormatterImpl;
 
 @Slf4j
 public class RootController extends BaseController {
@@ -177,7 +176,7 @@ public class RootController extends BaseController {
                     QueryResult queryResult = jdbcService.getQueryResult(showViewDdlQuery);
                     if(queryResult.getRows().size() == 1) {
                         String viewDDL = queryResult.getRows().get(0).get(0);
-                        String formattedViewDDL = new BasicFormatterImpl().format(viewDDL);
+                        Object formattedViewDDL = new SQLFormatter().prettyPrint(viewDDL);
                         return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", ImmutableList.builder().add(formattedViewDDL).build()).build());
                     } else {
                         return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", ImmutableList.builder().build()).build());
