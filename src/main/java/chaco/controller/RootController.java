@@ -27,6 +27,7 @@ import me.geso.avans.annotation.Param;
 import me.geso.webscrew.response.WebResponse;
 
 import chaco.service.JdbcService;
+import org.apache.openjpa.lib.jdbc.SQLFormatter;
 import org.hibernate.engine.jdbc.internal.BasicFormatterImpl;
 
 @Slf4j
