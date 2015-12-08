@@ -174,9 +174,13 @@ public class RootController extends BaseController {
                 String showViewDdlQuery = "SELECT DEFINITION FROM _v_view WHERE DATABASE='" + config.getJdbc().getCatalog() + "' AND SCHEMA='" + schemaOptinal.get() + "' AND VIEWNAME='" + tableOptinal.get() + "'";
                 try {
                     QueryResult queryResult = jdbcService.getQueryResult(showViewDdlQuery);
-                    String viewDDL = queryResult.getRows().get(0).get(0);
-                    Object formattedViewDDL = new SQLFormatter().prettyPrint(viewDDL);
-                    return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", ImmutableList.builder().add(formattedViewDDL).build()).build());
+                    if(queryResult.getRows().size() == 1) {
+                        String viewDDL = queryResult.getRows().get(0).get(0);
+                        Object formattedViewDDL = new SQLFormatter().prettyPrint(viewDDL);
+                        return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", ImmutableList.builder().add(formattedViewDDL).build()).build());
+                    } else {
+                        return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", ImmutableList.builder().build()).build());
+                    }
                 } catch (SQLException e) {
                     log.error(e.getMessage(), e);
                     return this.renderJSON(ImmutableMap.builder().put("error", e.getMessage()).build());
