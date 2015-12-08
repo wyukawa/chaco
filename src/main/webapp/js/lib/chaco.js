@@ -116,7 +116,25 @@ var chaco_tree = (function () {
                                 $("#query-results").empty();
                                 var columnNames = data.columnNames;
                                 var rows = data.rows;
-                                create_table("#query-results", columnNames, rows);
+                                var thead = document.createElement("thead");
+                                var tr = document.createElement("tr");
+                                for (var i = 0; i < columnNames.length; ++i) {
+                                    var th = document.createElement("th");
+                                    $(th).text(columnNames[i]);
+                                    $(tr).append(th);
+                                }
+                                $(thead).append(tr);
+                                $("#query-results").append(thead);
+                                var tbody = document.createElement("tbody");
+                                var tr = document.createElement("tr");
+                                var columns = rows[0];
+                                var td = document.createElement("td");
+                                $(td).html('<p>' + columns.replace(/\r?\n/g, "<br />") + '</p>');
+                                $(tr).append(td);
+                                $(tbody).append(tr);
+                                $("#query-results").append(tbody);
+                                $("#query-results").tablefix({height: 800, fixRows: 1});
+
                             }
                         };
                         $.get(requestURL, requestData, successHandler, "json");
