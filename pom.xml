@@ -143,9 +143,9 @@
 			<version>3.8.11.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.openjpa</groupId>
-			<artifactId>openjpa-lib</artifactId>
-			<version>2.4.0</version>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>5.0.5.Final</version>
 		</dependency>
 	</dependencies>
 
