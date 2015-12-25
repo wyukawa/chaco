@@ -77,12 +77,12 @@
                 });
             </script>
 
-            <h4>query executions/query histories</h4>
+            <h4>query histories/query executions</h4>
 
             <div id="tabs">
                 <ul>
-                    <li><a href="#query-executions-tab">query executions</a></li>
                     <li><a href="#query-histories-tab">query histories</a></li>
+                    <li><a href="#query-executions-tab">query executions</a></li>
                 </ul>
 
                 <div id="query-executions-tab">
