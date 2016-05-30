@@ -200,7 +200,7 @@ public class RootController extends BaseController {
         HashCode hc = hf.newHasher().putString(query + ";" + now, Charsets.UTF_8).hash();
         String queryId = hc.toString();
 
-        String insertQuery = "INSERT INTO query VALUES(\"" + queryId + "\", \"" + now + "\", \"" + query + "\")";
+        String insertQuery = String.format("INSERT INTO query VALUES('%s', '%s', '%s')", queryId, now, query.replace("'", "''"));
 
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:data/chaco.db")) {
             try(PreparedStatement statement = connection.prepareStatement(insertQuery)) {
