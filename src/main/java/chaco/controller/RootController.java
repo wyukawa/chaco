@@ -1,18 +1,29 @@
 package chaco.controller;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
 import chaco.QueryResult;
 import chaco.config.Config;
+import chaco.util.QueryUtil;
+import chaco.util.PathUtil;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -76,13 +87,12 @@ public class RootController extends BaseController {
 
         try {
             String query = queryOptional.orElse("");
-            String queryId = store(query);
-            QueryResult queryResult = jdbcService.getQueryResult(query);
+            QueryResult queryResult = jdbcService.getQueryResult(query, true);
             Optional<String> warningMessageOptinal = Optional.ofNullable(queryResult.getWarningMessage());
             if(warningMessageOptinal.isPresent()) {
-                return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("queryid", queryId).put("warn", warningMessageOptinal.get()).build());
+                return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("queryid", queryResult.getQueryId()).put("warn", warningMessageOptinal.get()).build());
             } else {
-                return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("queryid", queryId).build());
+                return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).put("queryid", queryResult.getQueryId()).build());
             }
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
@@ -97,7 +107,7 @@ public class RootController extends BaseController {
         try {
             if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
                 String query = "SELECT * FROM _v_qryhist  WHERE QH_DATABASE='" + config.getJdbc().getCatalog() + "' ORDER BY QH_TSUBMIT DESC LIMIT 100";
-                QueryResult queryResult = jdbcService.getQueryResult(query);
+                QueryResult queryResult = jdbcService.getQueryResult(query, false);
                 return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).build());
             } else {
                 return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().build()).put("rows", ImmutableList.builder().build()).build());
@@ -115,7 +125,7 @@ public class RootController extends BaseController {
         try {
             if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
                 String query = "SELECT * FROM _v_qrystat ORDER BY QS_TSUBMIT DESC";
-                QueryResult queryResult = jdbcService.getQueryResult(query);
+                QueryResult queryResult = jdbcService.getQueryResult(query, false);
                 return this.renderJSON(ImmutableMap.builder().put("columnNames", queryResult.getColumnNames()).put("rows", queryResult.getRows()).build());
             } else {
                 return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().build()).put("rows", ImmutableList.builder().build()).build());
@@ -132,8 +142,7 @@ public class RootController extends BaseController {
 
         try {
             String query = queryOptional.orElse("");
-            store(query);
-            String queryId = store(query);
+            String queryId = QueryUtil.store(query);
             int updateCount = jdbcService.update(query);
             return this.renderJSON(ImmutableMap.builder().put("columnNames", ImmutableList.builder().add("update count").build()).put("rows", ImmutableList.builder().add(updateCount).build()).put("queryid", queryId).build());
         } catch (SQLException e) {
@@ -157,7 +166,37 @@ public class RootController extends BaseController {
                 try(ResultSet rs = statement.executeQuery()) {
                     rs.next();
                     String queryString = rs.getString("query_string");
-                    return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).build());
+                    String warningMessage = null;
+                    List<String> columnNames = new ArrayList<>();
+                    List<List<String>> rows = new ArrayList<List<String>>();
+                    try (BufferedReader br = Files.newBufferedReader(PathUtil.getResultFilePath(queryidOptional.get()), StandardCharsets.UTF_8)) {
+                        String line = br.readLine();
+                        int lineNumber = 0;
+                        int limit = config.getLimit();
+                        while (line != null) {
+                            if (lineNumber == 0) {
+                                String[] columns = line.split("\t");
+                                columnNames = Arrays.asList(columns);
+                            } else {
+                                if (lineNumber <= limit) {
+                                    String[] row = line.split("\t");
+                                    rows.add(Arrays.asList(row));
+                                } else {
+                                    warningMessage = String.format("now fetch size is %d. This is more than %d. So, fetch operation stopped.", rows.size(), limit);
+                                }
+                            }
+                            lineNumber++;
+                            line = br.readLine();
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if(warningMessage == null) {
+                        return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).put("columnNames", columnNames).put("rows", rows).build());
+                    } else {
+                        return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).put("columnNames", columnNames).put("rows", rows).put("warn", warningMessage).build());
+                    }
+
                 }
             }
         } catch (SQLException e) {
@@ -173,7 +212,7 @@ public class RootController extends BaseController {
             if(config.getJdbc().getDriver().equals("org.netezza.Driver")) {
                 String showViewDdlQuery = "SELECT DEFINITION FROM _v_view WHERE DATABASE='" + config.getJdbc().getCatalog() + "' AND SCHEMA='" + schemaOptinal.get() + "' AND VIEWNAME='" + tableOptinal.get() + "'";
                 try {
-                    QueryResult queryResult = jdbcService.getQueryResult(showViewDdlQuery);
+                    QueryResult queryResult = jdbcService.getQueryResult(showViewDdlQuery, false);
                     if(queryResult.getRows().size() == 1) {
                         String viewDDL = queryResult.getRows().get(0).get(0);
                         Object formattedViewDDL = new SQLFormatter().prettyPrint(viewDDL);
@@ -190,25 +229,6 @@ public class RootController extends BaseController {
             }
         } else {
             return this.renderJSON(ImmutableMap.builder().put("error", "schema/table parameter is required").build());
-        }
-
-    }
-
-    private String store(String query) {
-        final String now = ZonedDateTime.now().toString();
-        HashFunction hf = Hashing.md5();
-        HashCode hc = hf.newHasher().putString(query + ";" + now, Charsets.UTF_8).hash();
-        String queryId = hc.toString();
-
-        String insertQuery = String.format("INSERT INTO query VALUES('%s', '%s', '%s')", queryId, now, query.replace("'", "''"));
-
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:data/chaco.db")) {
-            try(PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-                final int updateCount = statement.executeUpdate();
-                return queryId;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
 
     }

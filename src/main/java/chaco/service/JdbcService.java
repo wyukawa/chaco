@@ -2,14 +2,22 @@ package chaco.service;
 
 import chaco.QueryResult;
 import chaco.config.Config;
+import chaco.util.PathUtil;
+import chaco.util.QueryUtil;
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 
 import javax.inject.Inject;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.ResultSetMetaData;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.sql.*;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +35,8 @@ public class JdbcService {
         this.connection = connection;
     }
 
-    public QueryResult getQueryResult(String query) throws SQLException{
+    public QueryResult getQueryResult(String query, boolean storeFlag) throws SQLException{
+        String queryId = QueryUtil.store(query);
         ImmutableList.Builder<List<String>> rows = ImmutableList.builder();
         ImmutableList.Builder<String> columnNames = ImmutableList.builder();
         try (PreparedStatement stmt = this.connection.prepareStatement(query)) {
@@ -39,24 +48,53 @@ public class JdbcService {
                     columnNames.add(columnName);
                 }
                 int rowSize = 0;
-                while (resultSet.next()) {
-                    List<String> columns = new ArrayList<>();
-                    for (int i = 1; i <= columnCount; i++) {
-                        String column = resultSet.getString(i);
-                        columns.add(column);
+                int limit = config.getLimit();
+                if(storeFlag == true) {
+                    Path dst = PathUtil.getResultFilePath(queryId);
+                    try (BufferedWriter bw = Files.newBufferedWriter(dst, StandardCharsets.UTF_8)) {
+                        bw.write(String.join("\t", columnNames.build()));
+                        bw.write("\n");
+                        while (resultSet.next()) {
+                            List<String> columns = new ArrayList<>();
+                            for (int i = 1; i <= columnCount; i++) {
+                                String column = resultSet.getString(i);
+                                columns.add(column);
+                            }
+                            if(rowSize < limit) {
+                                rows.add(columns);
+                                rowSize++;
+                                bw.write(String.join("\t", columns));
+                                bw.write("\n");
+                            } else {
+                                QueryResult queryResult = new QueryResult(queryId, rows.build(), columnNames.build());
+                                queryResult.setWarningMessage(String.format("row size is more than %d. So, fetch operation stopped.", limit));
+                                return queryResult;
+                            }
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                    rows.add(columns);
-                    rowSize++;
-
-                    if(rowSize >= config.getLimit()) {
-                        QueryResult queryResult = new QueryResult(rows.build(), columnNames.build());
-                        queryResult.setWarningMessage(String.format("row size is more than %d. So, fetch operation stopped.", config.getLimit()));
-                        return queryResult;
+                } else {
+                    while (resultSet.next()) {
+                        List<String> columns = new ArrayList<>();
+                        for (int i = 1; i <= columnCount; i++) {
+                            String column = resultSet.getString(i);
+                            columns.add(column);
+                        }
+                        if(rowSize < limit) {
+                            rows.add(columns);
+                            rowSize++;
+                        } else {
+                            QueryResult queryResult = new QueryResult(queryId, rows.build(), columnNames.build());
+                            queryResult.setWarningMessage(String.format("row size is more than %d. So, fetch operation stopped.", limit));
+                            return queryResult;
+                        }
                     }
                 }
+
             }
         }
-        return new QueryResult(rows.build(), columnNames.build());
+        return new QueryResult(queryId, rows.build(), columnNames.build());
     }
 
     public List<String> getTableNames(String catalog, String schemaPattern) {

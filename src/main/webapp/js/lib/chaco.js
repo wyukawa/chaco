@@ -197,7 +197,7 @@ var handle_execute = (function () {
             var rows = data.rows;
             create_table("#query-results", columnNames, rows);
             $("#tsv-download").removeAttr("disabled");
-            push_result(columnNames, rows);
+            push_result(data.queryid, columnNames, rows);
         }
     };
     $.post(requestURL, requestData, successHandler, "json");
@@ -391,16 +391,33 @@ function follow_current_uri() {
 function follow_current_uri_query(queryid){
     $.get("/history", {queryid: queryid}, function (data) {
         window.editor.setValue(data.queryString);
+        if (data.error) {
+            $("#error-msg").text(data.error);
+            $("#error-msg").slideDown("fast");
+        } else {
+            if (data.warn) {
+                $("#warn-msg").text(data.warn);
+                $("#warn-msg").slideDown("fast");
+            }
+            $("#query-results").empty();
+            var columnNames = data.columnNames;
+            var rows = data.rows;
+            create_table("#query-results", columnNames, rows);
+            $("#tsv-download").removeAttr("disabled");
+            push_result(queryid, columnNames, rows);
+        }
     });
 };
 
-var push_result = (function (headers, rows) {
+var push_result = (function (queryid, headers, rows) {
     if (!window.sessionStorage) return;
+    window.sessionStorage.queryid = queryid;
     window.sessionStorage.query_header = JSON.stringify(headers);
     window.sessionStorage.query_result = JSON.stringify(rows);
 });
 
 var tsv_download = (function () {
+    var queryid = window.sessionStorage.queryid;
     var query_header_string = window.sessionStorage.query_header;
     var query_result_string = window.sessionStorage.query_result;
     var headers = JSON.parse(query_header_string);
@@ -421,10 +438,9 @@ var tsv_download = (function () {
         }
         text += "\n";
     }
-    var name = "result"
     var blob = new Blob([text], {type: 'text/plain'})
     var link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
-    link.download = name + '.tsv'
+    link.download = queryid + '.tsv'
     link.click()
 });
