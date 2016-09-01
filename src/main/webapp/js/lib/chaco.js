@@ -197,7 +197,6 @@ var handle_execute = (function () {
             var rows = data.rows;
             create_table("#query-results", columnNames, rows);
             $("#tsv-download").removeAttr("disabled");
-            push_result(data.queryid, columnNames, rows);
         }
     };
     $.post(requestURL, requestData, successHandler, "json");
@@ -404,43 +403,19 @@ function follow_current_uri_query(queryid){
             var rows = data.rows;
             create_table("#query-results", columnNames, rows);
             $("#tsv-download").removeAttr("disabled");
-            push_result(queryid, columnNames, rows);
         }
     });
 };
 
-var push_result = (function (queryid, headers, rows) {
-    if (!window.sessionStorage) return;
-    window.sessionStorage.queryid = queryid;
-    window.sessionStorage.query_header = JSON.stringify(headers);
-    window.sessionStorage.query_result = JSON.stringify(rows);
-});
-
 var tsv_download = (function () {
-    var queryid = window.sessionStorage.queryid;
-    var query_header_string = window.sessionStorage.query_header;
-    var query_result_string = window.sessionStorage.query_result;
-    var headers = JSON.parse(query_header_string);
-    var rows = JSON.parse(query_result_string);
-    var text = headers.join("\t");
-    text += "\n";
-    for (var i = 0; i < rows.length; ++i) {
-        var columns = rows[i];
-        for (var j = 0; j < columns.length; ++j) {
-            if (typeof columns[j] == "object") {
-                text += JSON.stringify(columns[j]);
-            } else {
-                text += columns[j];
-            }
-            if (j != columns.length - 1) {
-                text += "\t";
-            }
-        }
-        text += "\n";
+    var param = document.location.search.substring(1);
+    if (param === null) {
+        return;
     }
-    var blob = new Blob([text], {type: 'text/plain'})
+    var element = param.split('=');
+    var queryid = element[1];
+
     var link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = queryid + '.tsv'
-    link.click()
+    link.href = "/download?queryid=" + queryid;
+    link.click();
 });

@@ -1,8 +1,6 @@
 package chaco.controller;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.geso.avans.annotation.GET;
 import me.geso.avans.annotation.POST;
 import me.geso.avans.annotation.Param;
+import me.geso.webscrew.response.CallbackResponse;
 import me.geso.webscrew.response.WebResponse;
 
 import chaco.service.JdbcService;
@@ -229,6 +228,34 @@ public class RootController extends BaseController {
             }
         } else {
             return this.renderJSON(ImmutableMap.builder().put("error", "schema/table parameter is required").build());
+        }
+
+    }
+
+    @GET("/download")
+    public WebResponse download(@Param("queryid") Optional<String> queryidOptional) {
+
+        if(queryidOptional.isPresent()) {
+            return new CallbackResponse((response) -> {
+                String queryid = queryidOptional.get();
+                String fileName = queryid + ".tsv";
+                response.setContentType("application/octet-stream");
+                response.setHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
+                try (OutputStream out = response.getOutputStream()) {
+                    try (InputStream in = Files.newInputStream(PathUtil.getResultFilePath(queryid))) {
+                        byte[] buff = new byte[1024];
+                        int len = 0;
+                        while ((len = in.read(buff, 0, buff.length)) != -1) {
+                            out.write(buff, 0, len);
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            });
+        } else {
+            return this.renderJSON(ImmutableMap.builder().put("error", "queryid parameter is required").build());
         }
 
     }

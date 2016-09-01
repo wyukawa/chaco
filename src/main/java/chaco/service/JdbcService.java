@@ -60,16 +60,18 @@ public class JdbcService {
                                 String column = resultSet.getString(i);
                                 columns.add(column);
                             }
+                            bw.write(String.join("\t", columns));
+                            bw.write("\n");
                             if(rowSize < limit) {
                                 rows.add(columns);
                                 rowSize++;
-                                bw.write(String.join("\t", columns));
-                                bw.write("\n");
-                            } else {
-                                QueryResult queryResult = new QueryResult(queryId, rows.build(), columnNames.build());
-                                queryResult.setWarningMessage(String.format("row size is more than %d. So, fetch operation stopped.", limit));
-                                return queryResult;
                             }
+                        }
+
+                        if(rowSize >= limit){
+                            QueryResult queryResult = new QueryResult(queryId, rows.build(), columnNames.build());
+                            queryResult.setWarningMessage(String.format("row size is more than %d. So, fetch operation stopped.", limit));
+                            return queryResult;
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
