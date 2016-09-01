@@ -189,7 +189,8 @@ public class RootController extends BaseController {
                             line = br.readLine();
                         }
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        log.error(e.getMessage(), e);
+                        return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).put("error", e.getMessage()).build());
                     }
 
                     return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).put("columnNames", columnNames).put("rows", rows).build());
