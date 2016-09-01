@@ -182,6 +182,7 @@ public class RootController extends BaseController {
                                     rows.add(Arrays.asList(row));
                                 } else {
                                     warningMessage = String.format("now fetch size is %d. This is more than %d. So, fetch operation stopped.", rows.size(), limit);
+                                    return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).put("columnNames", columnNames).put("rows", rows).put("warn", warningMessage).build());
                                 }
                             }
                             lineNumber++;
@@ -190,11 +191,8 @@ public class RootController extends BaseController {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    if(warningMessage == null) {
-                        return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).put("columnNames", columnNames).put("rows", rows).build());
-                    } else {
-                        return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).put("columnNames", columnNames).put("rows", rows).put("warn", warningMessage).build());
-                    }
+
+                    return this.renderJSON(ImmutableMap.builder().put("queryString", queryString).put("columnNames", columnNames).put("rows", rows).build());
 
                 }
             }
