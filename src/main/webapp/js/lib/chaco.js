@@ -169,7 +169,7 @@ var handle_execute = (function () {
     $("#query-results").append(tr);
     var query = window.editor.getValue();
     var requestURL;
-    if (/^\s*(with .*)?\s*(explain\s+)?select .* from .+$/i.exec(removeNewLinesAndComments(query))){
+    if (/^\s*(with .*)?\s*(explain\s+)?select.*/i.exec(removeNewLinesAndComments(query))){
         requestURL = "/query";
     } else {
         requestURL = "/update";
